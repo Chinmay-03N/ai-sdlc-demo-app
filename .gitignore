@@ -8,3 +8,11 @@ node_modules/
 .env
 test-results/
 playwright-report/
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+mutants/
+backend/mutants/

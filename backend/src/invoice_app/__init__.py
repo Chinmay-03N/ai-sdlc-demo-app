@@ -1,0 +1,1 @@
+"""Invoice approval application package."""
