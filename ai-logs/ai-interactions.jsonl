@@ -1,0 +1,3 @@
+{"ts": "2026-10-31T17:31:11+00:00", "event": "sessionStart", "session": "ca875ec5-b637-4351-8613-dc336505aa19"}
+{"ts": "2026-10-31T17:31:12+00:00", "event": "userPromptSubmitted", "session": "ca875ec5-b637-4351-8613-dc336505aa19", "prompt": "hello"}
+{"ts": "2026-10-31T17:31:20+00:00", "event": "agentStop", "session": "ca875ec5-b637-4351-8613-dc336505aa19"}
