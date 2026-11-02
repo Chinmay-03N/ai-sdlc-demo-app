@@ -10,9 +10,10 @@ from fastapi.testclient import TestClient
 from invoice_app.api.auth import SessionStore, UserSession
 from invoice_app.api.in_memory_repository import InMemoryInvoiceRepository
 from invoice_app.api.main import app
+from invoice_app.domain.approval_policy import evaluate_approval
 from invoice_app.domain.approval_service import ApprovalService
 from invoice_app.domain.errors import ApprovalNotAllowed
-from invoice_app.domain.models import Approver, Invoice, InvoiceStatus, Role
+from invoice_app.domain.models import ApprovalRecord, Approver, Invoice, InvoiceStatus, Role
 
 from fakes import FakeInvoiceRepository
 
@@ -74,6 +75,64 @@ def test_manager_cannot_approve_amount_above_limit() -> None:
 
     assert repository.update_calls == 0
     assert repository.get_by_id("INV-1") == original
+
+
+def test_manager_cannot_approve_exact_director_limit() -> None:
+    """FR-002: A Manager remains subject to the Manager limit at 500,000.00."""
+    invoice = invoice_for("500000.00")
+    service, repository = make_service(invoice)
+    original = repository.get_by_id("INV-1")
+    expected = "Invoice amount 500,000.00 exceeds the Manager approval limit of 50,000.00."
+
+    with pytest.raises(ApprovalNotAllowed, match=f"^{re.escape(expected)}$"):
+        service.approve("INV-1", Approver("priya.sharma", Role.MANAGER))
+
+    assert repository.update_calls == 0
+    assert repository.get_by_id("INV-1") == original
+
+
+def test_admin_policy_refusal_returns_false() -> None:
+    decision = evaluate_approval(invoice_for("100.00"), Approver("alex.chen", Role.ADMIN))
+
+    assert decision.allowed is False
+    assert decision.reason == "Role Admin cannot approve invoices."
+
+
+def test_same_user_policy_refusal_returns_false() -> None:
+    invoice = invoice_for("500000.01")
+    invoice.status = InvoiceStatus.AwaitingSecondApproval
+    invoice.approvals = [
+        ApprovalRecord(username="charlotte.ward", role=Role.DIRECTOR, approved_at=FIXED_NOW),
+    ]
+
+    decision = evaluate_approval(invoice, Approver("CHARLOTTE.WARD", Role.DIRECTOR))
+
+    assert decision.allowed is False
+    assert decision.reason == (
+        "CHARLOTTE.WARD has already approved invoice INV-1; the same user cannot count as both approvers."
+    )
+
+
+def test_manager_second_approval_policy_refusal_returns_false() -> None:
+    invoice = invoice_for("500000.01")
+    invoice.status = InvoiceStatus.AwaitingSecondApproval
+    invoice.approvals = [
+        ApprovalRecord(username="maria.chen", role=Role.MANAGER, approved_at=FIXED_NOW),
+    ]
+
+    decision = evaluate_approval(invoice, Approver("nina.patel", Role.MANAGER))
+
+    assert decision.allowed is False
+    assert decision.reason == (
+        "Invoices above 500,000.00 need a Director as the second approver; nina.patel is a Manager."
+    )
+
+
+def test_manager_limit_policy_refusal_returns_false() -> None:
+    decision = evaluate_approval(invoice_for("50000.01"), Approver("priya.sharma", Role.MANAGER))
+
+    assert decision.allowed is False
+    assert decision.reason == "Invoice amount 50,000.01 exceeds the Manager approval limit of 50,000.00."
 
 
 def test_director_can_approve_up_to_and_including_500000() -> None:
