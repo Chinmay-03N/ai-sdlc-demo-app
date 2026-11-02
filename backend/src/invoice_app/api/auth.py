@@ -2,21 +2,24 @@ from __future__ import annotations
 
 import secrets
 from dataclasses import dataclass
-from typing import Iterable
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, Response
 
-DEMO_USERS: dict[str, str] = {
-    "demo.approver": "Approver",
-    "demo.admin": "Admin",
+from invoice_app.domain.models import Role
+
+DEMO_USERS: dict[str, Role] = {
+    "demo.manager": Role.MANAGER,
+    "demo.director": Role.DIRECTOR,
+    "demo.director2": Role.DIRECTOR,
+    "demo.admin": Role.ADMIN,
 }
 
 
 @dataclass(frozen=True)
 class UserSession:
     username: str
-    role: str
+    role: Role
 
 
 class SessionStore:
@@ -45,12 +48,14 @@ async def get_session_from_request(request: Request) -> UserSession:
     return session
 
 
-def require_role(*allowed_roles: str):
+def require_role(*allowed_roles: str | Role):
+    allowed = {Role(role) if not isinstance(role, Role) else role for role in allowed_roles}
+
     async def dependency(request: Request) -> UserSession:
         session = getattr(request.state, "session", None)
         if session is None:
             raise HTTPException(status_code=401, detail={"error": "Unauthorized"})
-        if session.role not in allowed_roles:
+        if session.role not in allowed:
             raise HTTPException(status_code=401, detail={"error": "Unauthorized"})
         return session
 
@@ -67,10 +72,9 @@ async def login(request: Request) -> dict:
     password = payload.get("password")
     demo_user = DEMO_USERS.get(username)
 
-    if username == "demo.approver" and password == "ChangeMe123!":
-        role = "Approver"
-    elif username == "demo.admin" and password == "ChangeMe123!":
-        role = "Admin"
+    demo_user = DEMO_USERS.get(username)
+    if demo_user is not None and password == "ChangeMe123!":
+        role = demo_user
     else:
         return JSONResponse(status_code=401, content={"error": "Invalid username or password."})
 

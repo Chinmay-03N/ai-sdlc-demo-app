@@ -12,3 +12,7 @@ class InvalidInvoiceState(InvoiceAppError):
 
 class InvalidRequest(InvoiceAppError):
     """Raised when an API request is malformed or invalid."""
+
+
+class ApprovalNotAllowed(InvoiceAppError):
+    """Raised when an approval attempt violates the approval policy."""

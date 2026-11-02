@@ -1,29 +1,48 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-from enum import Enum
-from typing import Optional
+from enum import StrEnum
 
 
-class InvoiceStatus(str, Enum):
+class Role(StrEnum):
+    MANAGER = "Manager"
+    DIRECTOR = "Director"
+    ADMIN = "Admin"
+
+
+class InvoiceStatus(StrEnum):
     Draft = "Draft"
     PendingApproval = "PendingApproval"
     Approved = "Approved"
     Rejected = "Rejected"
 
 
+@dataclass(frozen=True)
+class Approver:
+    username: str
+    role: Role
+
+
+@dataclass(frozen=True)
+class ApprovalRecord:
+    username: str
+    role: Role
+    approved_at: datetime
+
+
 @dataclass
 class Invoice:
     id: str = ""
     customer_name: str = ""
-    amount: Decimal = Decimal("0")
+    amount: Decimal = Decimal(0)
     status: InvoiceStatus = InvoiceStatus.Draft
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    decided_by: Optional[str] = None
-    decided_at: Optional[datetime] = None
-    decision_note: Optional[str] = None
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    decided_by: str | None = None
+    decided_at: datetime | None = None
+    decision_note: str | None = None
+    approvals: list[ApprovalRecord] = field(default_factory=list)
 
     def to_api_dict(self) -> dict:
         return {

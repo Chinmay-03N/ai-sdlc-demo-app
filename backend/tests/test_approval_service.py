@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
 from invoice_app.domain.approval_service import ApprovalService
 from invoice_app.domain.errors import InvalidInvoiceState, InvalidRequest, InvoiceNotFound
-from invoice_app.domain.models import Invoice, InvoiceStatus
+from invoice_app.domain.models import Approver, Invoice, InvoiceStatus, Role
+
 from fakes import FakeInvoiceRepository
 
 
@@ -35,13 +36,14 @@ def test_submit_rejects_invoice_that_is_not_a_draft() -> None:
 
 
 def test_approve_sets_status_approver_and_timestamp() -> None:
-    fixed_time = datetime(2024, 1, 15, 12, 0, tzinfo=timezone.utc)
+    fixed_time = datetime(2024, 1, 15, 12, 0, tzinfo=UTC)
     service = service_for(invoice_with("INV-1", InvoiceStatus.PendingApproval), fixed_time=fixed_time)
+    approver = Approver("demo.manager", Role.MANAGER)
 
-    result = service.approve("INV-1", "demo.approver")
+    result = service.approve("INV-1", approver)
 
     assert result.status == InvoiceStatus.Approved
-    assert result.decided_by == "demo.approver"
+    assert result.decided_by == "demo.manager"
     assert result.decided_at == fixed_time
 
 
@@ -49,20 +51,20 @@ def test_approve_rejects_invoice_that_is_still_a_draft() -> None:
     service = service_for(invoice_with("INV-1", InvoiceStatus.Draft))
 
     with pytest.raises(InvalidInvoiceState):
-        service.approve("INV-1", "demo.approver")
+        service.approve("INV-1", Approver("demo.manager", Role.MANAGER))
 
 
 def test_approve_throws_when_invoice_does_not_exist() -> None:
     service = service_for()
 
     with pytest.raises(InvoiceNotFound):
-        service.approve("INV-404", "demo.approver")
+        service.approve("INV-404", Approver("demo.manager", Role.MANAGER))
 
 
 def test_reject_records_reason_and_approver() -> None:
     service = service_for(invoice_with("INV-1", InvoiceStatus.PendingApproval))
 
-    result = service.reject("INV-1", "demo.approver", "Duplicate invoice")
+    result = service.reject("INV-1", Approver("demo.manager", Role.MANAGER), "Duplicate invoice")
 
     assert result.status == InvoiceStatus.Rejected
     assert result.decision_note == "Duplicate invoice"
@@ -72,4 +74,4 @@ def test_reject_requires_a_reason() -> None:
     service = service_for(invoice_with("INV-1", InvoiceStatus.PendingApproval))
 
     with pytest.raises(InvalidRequest):
-        service.reject("INV-1", "demo.approver", "  ")
+        service.reject("INV-1", Approver("demo.manager", Role.MANAGER), "  ")

@@ -11,8 +11,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from invoice_app.api.auth import SessionStore, UserSession, auth_router, require_role
 from invoice_app.api.in_memory_repository import InMemoryInvoiceRepository
 from invoice_app.domain.approval_service import ApprovalService
-from invoice_app.domain.errors import InvalidInvoiceState, InvalidRequest, InvoiceNotFound
-from invoice_app.domain.models import Invoice, InvoiceStatus
+from invoice_app.domain.errors import ApprovalNotAllowed, InvalidInvoiceState, InvalidRequest, InvoiceNotFound
+from invoice_app.domain.models import Approver, Invoice, InvoiceStatus
 
 
 class CreateInvoiceRequest(BaseModel):
@@ -60,6 +60,11 @@ async def invalid_invoice_state_handler(_, exc: InvalidInvoiceState):
 @app.exception_handler(InvalidRequest)
 async def invalid_request_handler(_, exc: InvalidRequest):
     return JSONResponse(status_code=400, content={"error": str(exc)})
+
+
+@app.exception_handler(ApprovalNotAllowed)
+async def approval_not_allowed_handler(_, exc: ApprovalNotAllowed):
+    return JSONResponse(status_code=403, content={"error": str(exc)})
 
 
 static_dir = Path(__file__).resolve().parent / "static"
@@ -139,12 +144,18 @@ def delete_invoice(invoice_id: str, session: UserSession = Depends(require_role(
 
 
 @app.post("/api/approvals/{invoice_id}/approve")
-def approve_invoice(invoice_id: str, session: UserSession = Depends(require_role("Approver", "Admin"))):
-    invoice = app.state.approval_service.approve(invoice_id, session.username)
+def approve_invoice(invoice_id: str, session: UserSession = Depends(require_role("Manager", "Director", "Admin"))):
+    approver = Approver(session.username, session.role)
+    invoice = app.state.approval_service.approve(invoice_id, approver)
     return to_api_dict(invoice)
 
 
 @app.post("/api/approvals/{invoice_id}/reject")
-def reject_invoice(invoice_id: str, payload: RejectRequest, session: UserSession = Depends(require_role("Approver", "Admin"))):
-    invoice = app.state.approval_service.reject(invoice_id, session.username, payload.reason)
+def reject_invoice(
+    invoice_id: str,
+    payload: RejectRequest,
+    session: UserSession = Depends(require_role("Manager", "Director", "Admin")),
+):
+    approver = Approver(session.username, session.role)
+    invoice = app.state.approval_service.reject(invoice_id, approver, payload.reason)
     return to_api_dict(invoice)

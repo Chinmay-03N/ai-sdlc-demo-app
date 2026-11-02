@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 
 from invoice_app.domain.models import Invoice, InvoiceStatus
 from invoice_app.domain.repository import InvoiceRepository
@@ -12,20 +13,40 @@ class InMemoryInvoiceRepository(InvoiceRepository):
 
     def __init__(self) -> None:
         self._next_number = 1006
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         self._invoices = [
-            Invoice(id="INV-1001", customer_name="Lakeside School District", amount=4250.00, status=InvoiceStatus.PendingApproval),
-            Invoice(id="INV-1002", customer_name="Hilltop Academy", amount=980.50, status=InvoiceStatus.PendingApproval),
+            Invoice(
+                id="INV-1001",
+                customer_name="Lakeside School District",
+                amount=Decimal("4250.00"),
+                status=InvoiceStatus.PendingApproval,
+            ),
+            Invoice(
+                id="INV-1002",
+                customer_name="Hilltop Academy",
+                amount=Decimal("980.50"),
+                status=InvoiceStatus.PendingApproval,
+            ),
             Invoice(
                 id="INV-1003",
                 customer_name="Riverside Charter",
-                amount=12300.00,
+                amount=Decimal("12300.00"),
                 status=InvoiceStatus.Approved,
-                decided_by="demo.approver",
+                decided_by="demo.director",
                 decided_at=now - timedelta(days=2),
             ),
-            Invoice(id="INV-1004", customer_name="Oakwood Independent", amount=615.75, status=InvoiceStatus.PendingApproval),
-            Invoice(id="INV-1005", customer_name="Maple Grove Prep", amount=310.00, status=InvoiceStatus.Draft),
+            Invoice(
+                id="INV-1004",
+                customer_name="Oakwood Independent",
+                amount=Decimal("615.75"),
+                status=InvoiceStatus.PendingApproval,
+            ),
+            Invoice(
+                id="INV-1005",
+                customer_name="Maple Grove Prep",
+                amount=Decimal("310.00"),
+                status=InvoiceStatus.Draft,
+            ),
         ]
 
     def get_all(self) -> list[Invoice]:
