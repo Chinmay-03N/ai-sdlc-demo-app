@@ -41,3 +41,8 @@ ignore = ["B008"]
 [tool.ruff.lint.isort]
 known-first-party = ["invoice_app"]
 known-local-folder = ["conftest", "fakes"]
+
+[tool.mutmut]
+source_paths = ["src/invoice_app/domain/"]
+pytest_add_cli_args_test_selection = ["tests/"]
+also_copy = ["tests/", "src/invoice_app/__init__.py", "src/invoice_app/api/"]

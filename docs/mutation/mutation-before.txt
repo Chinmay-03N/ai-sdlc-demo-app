@@ -1,0 +1,1002 @@
+Mutation run BEFORE - 2026-11-02 - 8bed991
+180 mutants: 102 killed, 24 survived, 54 no tests -> 56.7% overall, 81.0% of covered code
+
+    102 killed
+     24 survived
+     54 tests
+
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_4
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_4: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -3,7 +3,7 @@
+     username = approver.username.strip()
+ 
+     if approver.role == Role.ADMIN:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(None, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_10
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_10: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -6,7 +6,7 @@
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(None, f"Role {role_name} cannot approve invoices.")
+ 
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_11
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_11: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -6,7 +6,7 @@
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(False, None)
+ 
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_12
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_12: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -6,7 +6,7 @@
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(f"Role {role_name} cannot approve invoices.")
+ 
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_13
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_13: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -6,7 +6,7 @@
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(False, )
+ 
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_14
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_14: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -6,7 +6,7 @@
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(True, f"Role {role_name} cannot approve invoices.")
+ 
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_20
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_20: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -11,7 +11,7 @@
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):
+             return ApprovalDecision(
+-                False,
++                None,
+                 f"{username} has already approved invoice {invoice.id}; the same user cannot count as both approvers.",
+             )
+         if approver.role != Role.DIRECTOR:
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_26
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_26: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -16,7 +16,7 @@
+             )
+         if approver.role != Role.DIRECTOR:
+             return ApprovalDecision(
+-                False,
++                None,
+                 f"Invoices above 500,000.00 need a Director as the second approver; {username} is a {role_name}.",
+             )
+         return ApprovalDecision(True)
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_35
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_35: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -21,7 +21,7 @@
+             )
+         return ApprovalDecision(True)
+ 
+-    if approver.role == Role.MANAGER and invoice.amount > DIRECTOR_LIMIT:
++    if approver.role == Role.MANAGER and invoice.amount >= DIRECTOR_LIMIT:
+         return ApprovalDecision(True)
+ 
+     if approver.role == Role.MANAGER and invoice.amount > MANAGER_LIMIT:
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_45
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_45: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -28,7 +28,7 @@
+         amount_text = _format_amount(invoice.amount)
+         limit_text = _format_amount(MANAGER_LIMIT)
+         return ApprovalDecision(
+-            False,
++            None,
+             f"Invoice amount {amount_text} exceeds the Manager approval limit of {limit_text}.",
+         )
+ 
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_1
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_1: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -1,6 +1,6 @@
+ def to_api_dict(self) -> dict:
+     return {
+-        "id": self.id,
++        "XXidXX": self.id,
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_2
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_2: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -1,6 +1,6 @@
+ def to_api_dict(self) -> dict:
+     return {
+-        "id": self.id,
++        "ID": self.id,
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_3
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_3: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -1,7 +1,7 @@
+ def to_api_dict(self) -> dict:
+     return {
+         "id": self.id,
+-        "customerName": self.customer_name,
++        "XXcustomerNameXX": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_4
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_4: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -1,7 +1,7 @@
+ def to_api_dict(self) -> dict:
+     return {
+         "id": self.id,
+-        "customerName": self.customer_name,
++        "customername": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_5
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_5: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -1,7 +1,7 @@
+ def to_api_dict(self) -> dict:
+     return {
+         "id": self.id,
+-        "customerName": self.customer_name,
++        "CUSTOMERNAME": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_6
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_6: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -2,7 +2,7 @@
+     return {
+         "id": self.id,
+         "customerName": self.customer_name,
+-        "amount": float(self.amount),
++        "XXamountXX": float(self.amount),
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_7
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_7: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -2,7 +2,7 @@
+     return {
+         "id": self.id,
+         "customerName": self.customer_name,
+-        "amount": float(self.amount),
++        "AMOUNT": float(self.amount),
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_8
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_8: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -2,7 +2,7 @@
+     return {
+         "id": self.id,
+         "customerName": self.customer_name,
+-        "amount": float(self.amount),
++        "amount": float(None),
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_9
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_9: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -3,7 +3,7 @@
+         "id": self.id,
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+-        "status": self.status.value,
++        "XXstatusXX": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_10
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_10: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -3,7 +3,7 @@
+         "id": self.id,
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+-        "status": self.status.value,
++        "STATUS": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_11
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_11: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -4,7 +4,7 @@
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+-        "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
++        "XXcreatedAtXX": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_12
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_12: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -4,7 +4,7 @@
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+-        "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
++        "createdat": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_13
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_13: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -4,7 +4,7 @@
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+-        "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
++        "CREATEDAT": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_14
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_14: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -4,7 +4,7 @@
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+-        "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
++        "createdAt": self.created_at.isoformat().replace(None, "Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_15
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_15: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -4,7 +4,7 @@
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+-        "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
++        "createdAt": self.created_at.isoformat().replace("+00:00", None),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_16
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_16: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -4,7 +4,7 @@
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+-        "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
++        "createdAt": self.created_at.isoformat().replace("Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_17
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_17: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -4,7 +4,7 @@
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+-        "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
++        "createdAt": self.created_at.isoformat().replace("+00:00", ),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_18
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_18: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -4,7 +4,7 @@
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+-        "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
++        "createdAt": self.created_at.isoformat().replace("XX+00:00XX", "Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_19
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_19: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -4,7 +4,7 @@
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+-        "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
++        "createdAt": self.created_at.isoformat().replace("+00:00", "XXZXX"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_20
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_20: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -4,7 +4,7 @@
+         "customerName": self.customer_name,
+         "amount": float(self.amount),
+         "status": self.status.value,
+-        "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
++        "createdAt": self.created_at.isoformat().replace("+00:00", "z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_21
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_21: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -5,7 +5,7 @@
+         "amount": float(self.amount),
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+-        "decidedBy": self.decided_by,
++        "XXdecidedByXX": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_22
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_22: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -5,7 +5,7 @@
+         "amount": float(self.amount),
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+-        "decidedBy": self.decided_by,
++        "decidedby": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_23
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_23: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -5,7 +5,7 @@
+         "amount": float(self.amount),
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+-        "decidedBy": self.decided_by,
++        "DECIDEDBY": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_24
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_24: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "XXdecidedAtXX": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_25
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_25: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "decidedat": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_26
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_26: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "DECIDEDAT": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_27
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_27: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if (self.decided_at) and False else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_28
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_28: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if (self.decided_at) or True else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_29
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_29: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "decidedAt": self.decided_at.isoformat().replace(None, "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_30
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_30: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "decidedAt": self.decided_at.isoformat().replace("+00:00", None) if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_31
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_31: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "decidedAt": self.decided_at.isoformat().replace("Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_32
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_32: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "decidedAt": self.decided_at.isoformat().replace("+00:00", ) if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_33
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_33: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "decidedAt": self.decided_at.isoformat().replace("XX+00:00XX", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_34
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_34: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "decidedAt": self.decided_at.isoformat().replace("+00:00", "XXZXX") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_35
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_35: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -6,7 +6,7 @@
+         "status": self.status.value,
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+-        "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
++        "decidedAt": self.decided_at.isoformat().replace("+00:00", "z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_36
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_36: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -7,7 +7,7 @@
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+-        "decisionNote": self.decision_note,
++        "XXdecisionNoteXX": self.decision_note,
+         "approvals": [
+             {
+                 "username": approval.username,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_37
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_37: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -7,7 +7,7 @@
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+-        "decisionNote": self.decision_note,
++        "decisionnote": self.decision_note,
+         "approvals": [
+             {
+                 "username": approval.username,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_38
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_38: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -7,7 +7,7 @@
+         "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+-        "decisionNote": self.decision_note,
++        "DECISIONNOTE": self.decision_note,
+         "approvals": [
+             {
+                 "username": approval.username,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_39
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_39: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -8,7 +8,7 @@
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+-        "approvals": [
++        "XXapprovalsXX": [
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_40
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_40: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -8,7 +8,7 @@
+         "decidedBy": self.decided_by,
+         "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
+         "decisionNote": self.decision_note,
+-        "approvals": [
++        "APPROVALS": [
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_41
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_41: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -10,7 +10,7 @@
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+-                "username": approval.username,
++                "XXusernameXX": approval.username,
+                 "role": approval.role.value,
+                 "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
+             }
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_42
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_42: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -10,7 +10,7 @@
+         "decisionNote": self.decision_note,
+         "approvals": [
+             {
+-                "username": approval.username,
++                "USERNAME": approval.username,
+                 "role": approval.role.value,
+                 "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
+             }
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_43
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_43: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -11,7 +11,7 @@
+         "approvals": [
+             {
+                 "username": approval.username,
+-                "role": approval.role.value,
++                "XXroleXX": approval.role.value,
+                 "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
+             }
+             for approval in self.approvals
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_44
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_44: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -11,7 +11,7 @@
+         "approvals": [
+             {
+                 "username": approval.username,
+-                "role": approval.role.value,
++                "ROLE": approval.role.value,
+                 "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
+             }
+             for approval in self.approvals
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_45
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_45: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -12,7 +12,7 @@
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+-                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++                "XXapprovedAtXX": approval.approved_at.isoformat().replace("+00:00", "Z"),
+             }
+             for approval in self.approvals
+         ],
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_46
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_46: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -12,7 +12,7 @@
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+-                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++                "approvedat": approval.approved_at.isoformat().replace("+00:00", "Z"),
+             }
+             for approval in self.approvals
+         ],
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_47
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_47: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -12,7 +12,7 @@
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+-                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++                "APPROVEDAT": approval.approved_at.isoformat().replace("+00:00", "Z"),
+             }
+             for approval in self.approvals
+         ],
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_48
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_48: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -12,7 +12,7 @@
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+-                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++                "approvedAt": approval.approved_at.isoformat().replace(None, "Z"),
+             }
+             for approval in self.approvals
+         ],
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_49
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_49: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -12,7 +12,7 @@
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+-                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++                "approvedAt": approval.approved_at.isoformat().replace("+00:00", None),
+             }
+             for approval in self.approvals
+         ],
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_50
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_50: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -12,7 +12,7 @@
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+-                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++                "approvedAt": approval.approved_at.isoformat().replace("Z"),
+             }
+             for approval in self.approvals
+         ],
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_51
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_51: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -12,7 +12,7 @@
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+-                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++                "approvedAt": approval.approved_at.isoformat().replace("+00:00", ),
+             }
+             for approval in self.approvals
+         ],
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_52
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_52: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -12,7 +12,7 @@
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+-                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++                "approvedAt": approval.approved_at.isoformat().replace("XX+00:00XX", "Z"),
+             }
+             for approval in self.approvals
+         ],
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_53
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_53: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -12,7 +12,7 @@
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+-                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "XXZXX"),
+             }
+             for approval in self.approvals
+         ],
+== invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_54
+# invoice_app.domain.models.xǁInvoiceǁto_api_dict__mutmut_54: no tests
+--- src/invoice_app/domain/models.py
++++ src/invoice_app/domain/models.py
+@@ -12,7 +12,7 @@
+             {
+                 "username": approval.username,
+                 "role": approval.role.value,
+-                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "z"),
+             }
+             for approval in self.approvals
+         ],
+== invoice_app.domain.approval_service.xǁApprovalServiceǁ__init____mutmut_4
+# invoice_app.domain.approval_service.xǁApprovalServiceǁ__init____mutmut_4: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -1,3 +1,3 @@
+ def __init__(self, repository: InvoiceRepository, clock: Callable[[], datetime] | None = None):
+     self._repository = repository
+-    self._clock = clock or (lambda: datetime.now(UTC))
++    self._clock = clock or (lambda: None)
+== invoice_app.domain.approval_service.xǁApprovalServiceǁ__init____mutmut_5
+# invoice_app.domain.approval_service.xǁApprovalServiceǁ__init____mutmut_5: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -1,3 +1,3 @@
+ def __init__(self, repository: InvoiceRepository, clock: Callable[[], datetime] | None = None):
+     self._repository = repository
+-    self._clock = clock or (lambda: datetime.now(UTC))
++    self._clock = clock or (lambda: datetime.now(None))
+== invoice_app.domain.approval_service.xǁApprovalServiceǁsubmit__mutmut_4
+# invoice_app.domain.approval_service.xǁApprovalServiceǁsubmit__mutmut_4: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -1,7 +1,7 @@
+ def submit(self, invoice_id: str) -> Invoice:
+     invoice = self._find(invoice_id)
+     if invoice.status != InvoiceStatus.Draft:
+-        raise InvalidInvoiceState(f"Invoice {invoice_id} is {invoice.status}; only drafts can be submitted.")
++        raise InvalidInvoiceState(None)
+ 
+     invoice.status = InvoiceStatus.PendingApproval
+     self._repository.update(invoice)
+== invoice_app.domain.approval_service.xǁApprovalServiceǁapprove__mutmut_12
+# invoice_app.domain.approval_service.xǁApprovalServiceǁapprove__mutmut_12: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -4,7 +4,7 @@
+ 
+     decision = evaluate_approval(invoice, approver)
+     if not decision.allowed:
+-        raise ApprovalNotAllowed(decision.reason or "Approval is not allowed.")
++        raise ApprovalNotAllowed(decision.reason or "XXApproval is not allowed.XX")
+ 
+     approval_time = self._clock()
+     username = approver.username.strip()
+== invoice_app.domain.approval_service.xǁApprovalServiceǁapprove__mutmut_13
+# invoice_app.domain.approval_service.xǁApprovalServiceǁapprove__mutmut_13: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -4,7 +4,7 @@
+ 
+     decision = evaluate_approval(invoice, approver)
+     if not decision.allowed:
+-        raise ApprovalNotAllowed(decision.reason or "Approval is not allowed.")
++        raise ApprovalNotAllowed(decision.reason or "approval is not allowed.")
+ 
+     approval_time = self._clock()
+     username = approver.username.strip()
+== invoice_app.domain.approval_service.xǁApprovalServiceǁapprove__mutmut_14
+# invoice_app.domain.approval_service.xǁApprovalServiceǁapprove__mutmut_14: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -4,7 +4,7 @@
+ 
+     decision = evaluate_approval(invoice, approver)
+     if not decision.allowed:
+-        raise ApprovalNotAllowed(decision.reason or "Approval is not allowed.")
++        raise ApprovalNotAllowed(decision.reason or "APPROVAL IS NOT ALLOWED.")
+ 
+     approval_time = self._clock()
+     username = approver.username.strip()
+== invoice_app.domain.approval_service.xǁApprovalServiceǁapprove__mutmut_29
+# invoice_app.domain.approval_service.xǁApprovalServiceǁapprove__mutmut_29: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -22,7 +22,7 @@
+         invoice.decided_by = username
+         invoice.decided_at = approval_time
+ 
+-    invoice.decision_note = None
++    invoice.decision_note = ""
+     invoice.approvals.append(ApprovalRecord(username=username, role=approver.role, approved_at=approval_time))
+     self._repository.update(invoice)
+     return invoice
+== invoice_app.domain.approval_service.xǁApprovalServiceǁapprove__mutmut_33
+# invoice_app.domain.approval_service.xǁApprovalServiceǁapprove__mutmut_33: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -23,6 +23,6 @@
+         invoice.decided_at = approval_time
+ 
+     invoice.decision_note = None
+-    invoice.approvals.append(ApprovalRecord(username=username, role=approver.role, approved_at=approval_time))
++    invoice.approvals.append(ApprovalRecord(username=username, role=approver.role, approved_at=None))
+     self._repository.update(invoice)
+     return invoice
+== invoice_app.domain.approval_service.xǁApprovalServiceǁreject__mutmut_4
+# invoice_app.domain.approval_service.xǁApprovalServiceǁreject__mutmut_4: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -1,6 +1,6 @@
+ def reject(self, invoice_id: str, approver: Approver, reason: str) -> Invoice:
+     if not reason or not reason.strip():
+-        raise InvalidRequest("A reason is required to reject an invoice.")
++        raise InvalidRequest(None)
+ 
+     invoice = self._find(invoice_id)
+     self._ensure_approvable(invoice)
+== invoice_app.domain.approval_service.xǁApprovalServiceǁreject__mutmut_5
+# invoice_app.domain.approval_service.xǁApprovalServiceǁreject__mutmut_5: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -1,6 +1,6 @@
+ def reject(self, invoice_id: str, approver: Approver, reason: str) -> Invoice:
+     if not reason or not reason.strip():
+-        raise InvalidRequest("A reason is required to reject an invoice.")
++        raise InvalidRequest("XXA reason is required to reject an invoice.XX")
+ 
+     invoice = self._find(invoice_id)
+     self._ensure_approvable(invoice)
+== invoice_app.domain.approval_service.xǁApprovalServiceǁreject__mutmut_6
+# invoice_app.domain.approval_service.xǁApprovalServiceǁreject__mutmut_6: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -1,6 +1,6 @@
+ def reject(self, invoice_id: str, approver: Approver, reason: str) -> Invoice:
+     if not reason or not reason.strip():
+-        raise InvalidRequest("A reason is required to reject an invoice.")
++        raise InvalidRequest("a reason is required to reject an invoice.")
+ 
+     invoice = self._find(invoice_id)
+     self._ensure_approvable(invoice)
+== invoice_app.domain.approval_service.xǁApprovalServiceǁreject__mutmut_7
+# invoice_app.domain.approval_service.xǁApprovalServiceǁreject__mutmut_7: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -1,6 +1,6 @@
+ def reject(self, invoice_id: str, approver: Approver, reason: str) -> Invoice:
+     if not reason or not reason.strip():
+-        raise InvalidRequest("A reason is required to reject an invoice.")
++        raise InvalidRequest("A REASON IS REQUIRED TO REJECT AN INVOICE.")
+ 
+     invoice = self._find(invoice_id)
+     self._ensure_approvable(invoice)
+== invoice_app.domain.approval_service.xǁApprovalServiceǁ_find__mutmut_4
+# invoice_app.domain.approval_service.xǁApprovalServiceǁ_find__mutmut_4: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -1,5 +1,5 @@
+ def _find(self, invoice_id: str) -> Invoice:
+     invoice = self._repository.get_by_id(invoice_id)
+     if invoice is None:
+-        raise InvoiceNotFound(f"Invoice {invoice_id} was not found.")
++        raise InvoiceNotFound(None)
+     return invoice
+== invoice_app.domain.approval_service.xǁApprovalServiceǁ_ensure_approvable__mutmut_2
+# invoice_app.domain.approval_service.xǁApprovalServiceǁ_ensure_approvable__mutmut_2: survived
+--- src/invoice_app/domain/approval_service.py
++++ src/invoice_app/domain/approval_service.py
+@@ -2,5 +2,5 @@
+ def _ensure_approvable(invoice: Invoice) -> None:
+     if invoice.status not in {InvoiceStatus.PendingApproval, InvoiceStatus.AwaitingSecondApproval}:
+         raise InvalidInvoiceState(
+-            f"Invoice {invoice.id} is {invoice.status}; only pending invoices can be decided."
++            None
+         )

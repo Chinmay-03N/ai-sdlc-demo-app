@@ -90,8 +90,25 @@ async def serve_styles() -> FileResponse:
     return FileResponse(static_dir / "styles.css")
 
 
-def to_api_dict(invoice: Invoice) -> dict[str, Any]:
-    return invoice.to_api_dict()
+def invoice_to_json(invoice: Invoice) -> dict[str, Any]:
+    return {
+        "id": invoice.id,
+        "customerName": invoice.customer_name,
+        "amount": float(invoice.amount),
+        "status": invoice.status.value,
+        "createdAt": invoice.created_at.isoformat().replace("+00:00", "Z"),
+        "decidedBy": invoice.decided_by,
+        "decidedAt": invoice.decided_at.isoformat().replace("+00:00", "Z") if invoice.decided_at else None,
+        "decisionNote": invoice.decision_note,
+        "approvals": [
+            {
+                "username": approval.username,
+                "role": approval.role.value,
+                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
+            }
+            for approval in invoice.approvals
+        ],
+    }
 
 
 @app.get("/api/invoices")
@@ -103,7 +120,7 @@ def get_invoices(status: str | None = None):
         except ValueError as exc:
             raise InvalidRequest(f"Unknown status '{status}'.") from exc
         invoices = [invoice for invoice in invoices if invoice.status == parsed_status]
-    return [to_api_dict(invoice) for invoice in invoices]
+    return [invoice_to_json(invoice) for invoice in invoices]
 
 
 @app.get("/api/invoices/{invoice_id}")
@@ -111,7 +128,7 @@ def get_invoice(invoice_id: str):
     invoice = app.state.repository.get_by_id(invoice_id)
     if invoice is None:
         raise InvoiceNotFound(f"Invoice {invoice_id} was not found.")
-    return to_api_dict(invoice)
+    return invoice_to_json(invoice)
 
 
 @app.post("/api/invoices", status_code=201)
@@ -124,7 +141,7 @@ def create_invoice(payload: CreateInvoiceRequest):
 
     invoice = Invoice(customer_name=customer_name, amount=payload.amount)
     created = app.state.repository.add(invoice)
-    response = JSONResponse(content=to_api_dict(created), status_code=201)
+    response = JSONResponse(content=invoice_to_json(created), status_code=201)
     response.headers["Location"] = f"/api/invoices/{created.id}"
     return response
 
@@ -132,7 +149,7 @@ def create_invoice(payload: CreateInvoiceRequest):
 @app.post("/api/invoices/{invoice_id}/submit")
 def submit_invoice(invoice_id: str):
     invoice = app.state.approval_service.submit(invoice_id)
-    return to_api_dict(invoice)
+    return invoice_to_json(invoice)
 
 
 @app.delete("/api/invoices/{invoice_id}")
@@ -147,7 +164,7 @@ def delete_invoice(invoice_id: str, session: UserSession = Depends(require_role(
 def approve_invoice(invoice_id: str, session: UserSession = Depends(require_role("Manager", "Director", "Admin"))):
     approver = Approver(session.username, session.role)
     invoice = app.state.approval_service.approve(invoice_id, approver)
-    return to_api_dict(invoice)
+    return invoice_to_json(invoice)
 
 
 @app.post("/api/approvals/{invoice_id}/reject")
@@ -158,4 +175,4 @@ def reject_invoice(
 ):
     approver = Approver(session.username, session.role)
     invoice = app.state.approval_service.reject(invoice_id, approver, payload.reason)
-    return to_api_dict(invoice)
+    return invoice_to_json(invoice)

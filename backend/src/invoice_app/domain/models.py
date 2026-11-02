@@ -44,23 +44,3 @@ class Invoice:
     decided_at: datetime | None = None
     decision_note: str | None = None
     approvals: list[ApprovalRecord] = field(default_factory=list)
-
-    def to_api_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "customerName": self.customer_name,
-            "amount": float(self.amount),
-            "status": self.status.value,
-            "createdAt": self.created_at.isoformat().replace("+00:00", "Z"),
-            "decidedBy": self.decided_by,
-            "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
-            "decisionNote": self.decision_note,
-            "approvals": [
-                {
-                    "username": approval.username,
-                    "role": approval.role.value,
-                    "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
-                }
-                for approval in self.approvals
-            ],
-        }
