@@ -25,19 +25,30 @@ class ApprovalService:
 
     def approve(self, invoice_id: str, approver: Approver) -> Invoice:
         invoice = self._find(invoice_id)
-        self._ensure_pending(invoice)
+        self._ensure_approvable(invoice)
 
         decision = evaluate_approval(invoice, approver)
         if not decision.allowed:
             raise ApprovalNotAllowed(decision.reason or "Approval is not allowed.")
 
         approval_time = self._clock()
-        invoice.status = InvoiceStatus.Approved
-        invoice.decided_by = approver.username
-        invoice.decided_at = approval_time
-        invoice.approvals.append(
-            ApprovalRecord(username=approver.username, role=approver.role, approved_at=approval_time)
-        )
+        username = approver.username.strip()
+
+        if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+            invoice.status = InvoiceStatus.Approved
+            invoice.decided_by = username
+            invoice.decided_at = approval_time
+        elif invoice.amount > 500000.00:
+            invoice.status = InvoiceStatus.AwaitingSecondApproval
+            invoice.decided_by = None
+            invoice.decided_at = None
+        else:
+            invoice.status = InvoiceStatus.Approved
+            invoice.decided_by = username
+            invoice.decided_at = approval_time
+
+        invoice.decision_note = None
+        invoice.approvals.append(ApprovalRecord(username=username, role=approver.role, approved_at=approval_time))
         self._repository.update(invoice)
         return invoice
 
@@ -46,11 +57,11 @@ class ApprovalService:
             raise InvalidRequest("A reason is required to reject an invoice.")
 
         invoice = self._find(invoice_id)
-        self._ensure_pending(invoice)
+        self._ensure_approvable(invoice)
 
         rejected_at = self._clock()
         invoice.status = InvoiceStatus.Rejected
-        invoice.decided_by = approver.username
+        invoice.decided_by = approver.username.strip()
         invoice.decided_at = rejected_at
         invoice.decision_note = reason
         self._repository.update(invoice)
@@ -63,8 +74,8 @@ class ApprovalService:
         return invoice
 
     @staticmethod
-    def _ensure_pending(invoice: Invoice) -> None:
-        if invoice.status != InvoiceStatus.PendingApproval:
+    def _ensure_approvable(invoice: Invoice) -> None:
+        if invoice.status not in {InvoiceStatus.PendingApproval, InvoiceStatus.AwaitingSecondApproval}:
             raise InvalidInvoiceState(
                 f"Invoice {invoice.id} is {invoice.status}; only pending invoices can be decided."
             )

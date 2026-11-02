@@ -15,6 +15,7 @@ class Role(StrEnum):
 class InvoiceStatus(StrEnum):
     Draft = "Draft"
     PendingApproval = "PendingApproval"
+    AwaitingSecondApproval = "AwaitingSecondApproval"
     Approved = "Approved"
     Rejected = "Rejected"
 
@@ -54,4 +55,12 @@ class Invoice:
             "decidedBy": self.decided_by,
             "decidedAt": self.decided_at.isoformat().replace("+00:00", "Z") if self.decided_at else None,
             "decisionNote": self.decision_note,
+            "approvals": [
+                {
+                    "username": approval.username,
+                    "role": approval.role.value,
+                    "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
+                }
+                for approval in self.approvals
+            ],
         }

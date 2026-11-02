@@ -89,19 +89,19 @@ def test_director_can_approve_up_to_and_including_500000() -> None:
     assert repository.update_calls == 1
 
 
-def test_director_cannot_approve_amount_above_limit() -> None:
-    """FR-003: Director approval is refused above 500,000.00."""
+def test_director_approval_above_limit_starts_second_approval_flow() -> None:
+    """FR-003 / FR-008: A Director can begin the second-approval flow above 500,000.00."""
     invoice = invoice_for("500000.01")
     service, repository = make_service(invoice)
-    original = repository.get_by_id("INV-1")
     approver = Approver("rajesh.lee", Role.DIRECTOR)
-    expected = "Invoice amount 500,000.01 exceeds the Director approval limit of 500,000.00."
 
-    with pytest.raises(ApprovalNotAllowed, match=re.escape(expected)):
-        service.approve("INV-1", approver)
+    result = service.approve("INV-1", approver)
 
-    assert repository.update_calls == 0
-    assert repository.get_by_id("INV-1") == original
+    assert result.status == InvoiceStatus.AwaitingSecondApproval
+    assert result.decided_by is None
+    assert result.decided_at is None
+    assert len(result.approvals) == 1
+    assert repository.update_calls == 1
 
 
 def test_admin_cannot_approve_invoice() -> None:
@@ -119,19 +119,12 @@ def test_admin_cannot_approve_invoice() -> None:
     assert repository.get_by_id("INV-1") == original
 
 
-@pytest.mark.parametrize(
-    "approver",
-    [
-        Approver("priya.sharma", Role.MANAGER),
-        Approver("rajesh.lee", Role.DIRECTOR),
-        Approver("alex.chen", Role.ADMIN),
-    ],
-)
-def test_approvals_above_director_limit_are_refused_in_this_increment(approver: Approver) -> None:
-    """FR-016: Single-approver increment intentionally refuses any invoice above 500,000.00."""
+def test_admin_approval_above_director_limit_is_refused() -> None:
+    """FR-012: Admin users are still refused even when the invoice is above 500,000.00."""
     invoice = invoice_for("500000.01")
     service, repository = make_service(invoice)
     original = repository.get_by_id("INV-1")
+    approver = Approver("alex.chen", Role.ADMIN)
 
     with pytest.raises(ApprovalNotAllowed):
         service.approve("INV-1", approver)

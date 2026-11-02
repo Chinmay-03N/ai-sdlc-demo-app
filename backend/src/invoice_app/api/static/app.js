@@ -40,7 +40,7 @@
   async function refresh() {
     const invoices = await api('/invoices');
     renderInvoices(invoices);
-    renderPending(invoices.filter((i) => i.status === 'PendingApproval'));
+    renderPending(invoices.filter((i) => ['PendingApproval', 'AwaitingSecondApproval'].includes(i.status)));
   }
 
   function renderInvoices(invoices) {
@@ -68,12 +68,14 @@
       const approve = el('button', { type: 'button', 'aria-label': `Approve invoice ${invoice.id}` }, 'Approve');
       const reject = el('button', { type: 'button', class: 'danger', 'aria-label': `Reject invoice ${invoice.id}` }, 'Reject');
       const reason = el('input', { id: reasonId, 'aria-label': `Rejection reason for ${invoice.id}`, placeholder: 'Reason (required to reject)' });
+      const approvers = (invoice.approvals || []).map((approval) => approval.username).join(', ') || 'No approvals yet';
 
       approve.addEventListener('click', () => decide(`/approvals/${invoice.id}/approve`, {}));
       reject.addEventListener('click', () => decide(`/approvals/${invoice.id}/reject`, { reason: reason.value }));
 
       return el('li', {},
-        el('span', {}, `${invoice.id} · ${invoice.customerName} · ${money.format(invoice.amount)}`),
+        el('span', {}, `${invoice.id} · ${invoice.customerName} · ${money.format(invoice.amount)} · ${invoice.status.replace(/([a-z])([A-Z])/g, '$1 $2')}`),
+        el('span', {}, `Approved by: ${approvers}`),
         el('span', {}, approve),
         el('div', { class: 'reject-row' }, reason, reject));
     }));
