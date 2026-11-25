@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from datetime import UTC, datetime
 
-from .approval_policy import evaluate_approval
+from .approval_policy import DIRECTOR_LIMIT, evaluate_approval
 from .errors import ApprovalNotAllowed, InvalidInvoiceState, InvalidRequest, InvoiceNotFound
 from .models import ApprovalRecord, Approver, Invoice, InvoiceStatus
 from .repository import InvoiceRepository
@@ -38,7 +38,7 @@ class ApprovalService:
             invoice.status = InvoiceStatus.Approved
             invoice.decided_by = username
             invoice.decided_at = approval_time
-        elif invoice.amount > 500000.00:
+        elif invoice.amount > DIRECTOR_LIMIT:
             invoice.status = InvoiceStatus.AwaitingSecondApproval
             invoice.decided_by = None
             invoice.decided_at = None

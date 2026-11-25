@@ -7,6 +7,7 @@ from .models import Approver, Invoice, InvoiceStatus, Role
 
 MANAGER_LIMIT = Decimal("50000.00")
 DIRECTOR_LIMIT = Decimal("500000.00")
+APPROVER_ROLES = frozenset({Role.MANAGER, Role.DIRECTOR})
 
 
 @dataclass(frozen=True)
@@ -32,10 +33,7 @@ def evaluate_approval(invoice: Invoice, approver: Approver) -> ApprovalDecision:
     role_name = approver.role.value
     username = approver.username.strip()
 
-    if approver.role == Role.ADMIN:
-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
-
-    if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+    if approver.role not in APPROVER_ROLES:
         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
 
     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
@@ -47,7 +45,8 @@ def evaluate_approval(invoice: Invoice, approver: Approver) -> ApprovalDecision:
         if approver.role != Role.DIRECTOR:
             return ApprovalDecision(
                 False,
-                f"Invoices above 500,000.00 need a Director as the second approver; {username} is a {role_name}.",
+                f"Invoices above {_format_amount(DIRECTOR_LIMIT)} need a Director as the second approver; "
+                f"{username} is a {role_name}.",
             )
         return ApprovalDecision(True)
 
