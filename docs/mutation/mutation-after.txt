@@ -1,0 +1,68 @@
+Mutation run AFTER - 2026-11-02 - 8e6b2ed
+126 mutants: 121 killed, 5 survived, 0 no tests -> 96.0%
+
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_10
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_10: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -6,7 +6,7 @@
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(None, f"Role {role_name} cannot approve invoices.")
+ 
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_11
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_11: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -6,7 +6,7 @@
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(False, None)
+ 
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_12
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_12: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -6,7 +6,7 @@
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(f"Role {role_name} cannot approve invoices.")
+ 
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_13
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_13: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -6,7 +6,7 @@
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(False, )
+ 
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):
+== invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_14
+# invoice_app.domain.approval_policy.x_evaluate_approval__mutmut_14: survived
+--- src/invoice_app/domain/approval_policy.py
++++ src/invoice_app/domain/approval_policy.py
+@@ -6,7 +6,7 @@
+         return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
+ 
+     if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
+-        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++        return ApprovalDecision(True, f"Role {role_name} cannot approve invoices.")
+ 
+     if invoice.status == InvoiceStatus.AwaitingSecondApproval:
+         if _already_approved(invoice, username):

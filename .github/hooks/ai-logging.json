@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      { "type": "command", "command": "python scripts/hooks/log_event.py sessionStart", "timeoutSec": 10 }
+    ],
+    "userPromptSubmitted": [
+      { "type": "command", "command": "python scripts/hooks/log_event.py userPromptSubmitted", "timeoutSec": 10 }
+    ],
+    "preToolUse": [
+      { "type": "command", "command": "python scripts/hooks/log_event.py preToolUse", "timeoutSec": 10 }
+    ],
+    "postToolUse": [
+      { "type": "command", "command": "python scripts/hooks/log_event.py postToolUse", "timeoutSec": 10 }
+    ],
+    "subagentStart": [
+      { "type": "command", "command": "python scripts/hooks/log_event.py subagentStart", "timeoutSec": 10 }
+    ],
+    "subagentStop": [
+      { "type": "command", "command": "python scripts/hooks/log_event.py subagentStop", "timeoutSec": 10 }
+    ],
+    "agentStop": [
+      { "type": "command", "command": "python scripts/hooks/log_event.py agentStop", "timeoutSec": 10 }
+    ],
+    "sessionEnd": [
+      { "type": "command", "command": "python scripts/hooks/log_event.py sessionEnd", "timeoutSec": 10 }
+    ]
+  }
+}

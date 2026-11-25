@@ -1,0 +1,2475 @@
+diff --git a/backend/InvoiceApp.sln b/backend/InvoiceApp.sln
+deleted file mode 100644
+index 38c9fdc..0000000
+--- a/backend/InvoiceApp.sln
++++ /dev/null
+@@ -1,43 +0,0 @@
+-﻿
+-Microsoft Visual Studio Solution File, Format Version 12.00
+-# Visual Studio Version 17
+-VisualStudioVersion = 17.0.31903.59
+-MinimumVisualStudioVersion = 10.0.40219.1
+-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3A4242C0-22F6-4D7B-9488-3822506178A8}"
+-EndProject
+-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceApp.Domain", "src\InvoiceApp.Domain\InvoiceApp.Domain.csproj", "{2EE7E746-5EBB-456D-B087-ED7C8739E29F}"
+-EndProject
+-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceApp.Api", "src\InvoiceApp.Api\InvoiceApp.Api.csproj", "{E4889265-E191-40B5-BFDC-9170A53A0016}"
+-EndProject
+-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7419651D-FC40-4BFF-9BEA-8991B34C1BCF}"
+-EndProject
+-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceApp.Tests", "tests\InvoiceApp.Tests\InvoiceApp.Tests.csproj", "{1F08E43D-1B0D-4A99-8A75-096693CA0E39}"
+-EndProject
+-Global
+-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+-		Debug|Any CPU = Debug|Any CPU
+-		Release|Any CPU = Release|Any CPU
+-	EndGlobalSection
+-	GlobalSection(SolutionProperties) = preSolution
+-		HideSolutionNode = FALSE
+-	EndGlobalSection
+-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+-		{2EE7E746-5EBB-456D-B087-ED7C8739E29F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+-		{2EE7E746-5EBB-456D-B087-ED7C8739E29F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+-		{2EE7E746-5EBB-456D-B087-ED7C8739E29F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+-		{2EE7E746-5EBB-456D-B087-ED7C8739E29F}.Release|Any CPU.Build.0 = Release|Any CPU
+-		{E4889265-E191-40B5-BFDC-9170A53A0016}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+-		{E4889265-E191-40B5-BFDC-9170A53A0016}.Debug|Any CPU.Build.0 = Debug|Any CPU
+-		{E4889265-E191-40B5-BFDC-9170A53A0016}.Release|Any CPU.ActiveCfg = Release|Any CPU
+-		{E4889265-E191-40B5-BFDC-9170A53A0016}.Release|Any CPU.Build.0 = Release|Any CPU
+-		{1F08E43D-1B0D-4A99-8A75-096693CA0E39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+-		{1F08E43D-1B0D-4A99-8A75-096693CA0E39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+-		{1F08E43D-1B0D-4A99-8A75-096693CA0E39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+-		{1F08E43D-1B0D-4A99-8A75-096693CA0E39}.Release|Any CPU.Build.0 = Release|Any CPU
+-	EndGlobalSection
+-	GlobalSection(NestedProjects) = preSolution
+-		{2EE7E746-5EBB-456D-B087-ED7C8739E29F} = {3A4242C0-22F6-4D7B-9488-3822506178A8}
+-		{E4889265-E191-40B5-BFDC-9170A53A0016} = {3A4242C0-22F6-4D7B-9488-3822506178A8}
+-		{1F08E43D-1B0D-4A99-8A75-096693CA0E39} = {7419651D-FC40-4BFF-9BEA-8991B34C1BCF}
+-	EndGlobalSection
+-EndGlobal
+diff --git a/backend/pyproject.toml b/backend/pyproject.toml
+new file mode 100644
+index 0000000..67675ff
+--- /dev/null
++++ b/backend/pyproject.toml
+@@ -0,0 +1,48 @@
++[build-system]
++requires = ["setuptools>=68"]
++build-backend = "setuptools.build_meta"
++
++[project]
++name = "invoice-app"
++version = "0.1.0"
++description = "Invoice approval demo app"
++requires-python = ">=3.11"
++dependencies = [
++    "fastapi>=0.115,<1.0",
++    "uvicorn[standard]>=0.30,<1.0",
++]
++
++[project.optional-dependencies]
++dev = [
++    "pytest>=8.0",
++    "httpx>=0.27",
++    "ruff>=0.6",
++    "mutmut>=2.5",
++    "pytest-playwright>=0.7",
++]
++
++[tool.setuptools]
++package-dir = {"" = "src"}
++
++[tool.setuptools.packages.find]
++where = ["src"]
++
++[tool.pytest.ini_options]
++pythonpath = ["src","tests"]
++testpaths = ["tests"]
++
++[tool.ruff]
++line-length = 120
++
++[tool.ruff.lint]
++select = ["E", "F", "I", "B", "UP"]
++ignore = ["B008"]
++
++[tool.ruff.lint.isort]
++known-first-party = ["invoice_app"]
++known-local-folder = ["conftest", "fakes"]
++
++[tool.mutmut]
++source_paths = ["src/invoice_app/domain/"]
++pytest_add_cli_args_test_selection = ["tests/"]
++also_copy = ["tests/", "src/invoice_app/__init__.py", "src/invoice_app/api/"]
+\ No newline at end of file
+diff --git a/backend/src/InvoiceApp.Api/Auth/RequireRoleAttribute.cs b/backend/src/InvoiceApp.Api/Auth/RequireRoleAttribute.cs
+deleted file mode 100644
+index 98f301a..0000000
+--- a/backend/src/InvoiceApp.Api/Auth/RequireRoleAttribute.cs
++++ /dev/null
+@@ -1,26 +0,0 @@
+-using Microsoft.AspNetCore.Mvc;
+-using Microsoft.AspNetCore.Mvc.Filters;
+-
+-namespace InvoiceApp.Api.Auth;
+-
+-/// <summary>Allows the action only for the listed roles; everyone else gets 403.</summary>
+-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+-public class RequireRoleAttribute : ActionFilterAttribute
+-{
+-    private readonly string[] _roles;
+-
+-    public RequireRoleAttribute(params string[] roles)
+-    {
+-        _roles = roles;
+-    }
+-
+-    public override void OnActionExecuting(ActionExecutingContext context)
+-    {
+-        var session = context.HttpContext.Items[HttpContextExtensions.SessionKey] as UserSession;
+-
+-        if (session is null || !_roles.Contains(session.Role))
+-        {
+-            context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
+-        }
+-    }
+-}
+diff --git a/backend/src/InvoiceApp.Api/Auth/SessionAuthMiddleware.cs b/backend/src/InvoiceApp.Api/Auth/SessionAuthMiddleware.cs
+deleted file mode 100644
+index 70d7514..0000000
+--- a/backend/src/InvoiceApp.Api/Auth/SessionAuthMiddleware.cs
++++ /dev/null
+@@ -1,46 +0,0 @@
+-namespace InvoiceApp.Api.Auth;
+-
+-/// <summary>Requires a valid bearer token on every /api call except sign-in.</summary>
+-public class SessionAuthMiddleware
+-{
+-    private const string BearerPrefix = "Bearer ";
+-    private readonly RequestDelegate _next;
+-    private readonly SessionStore _sessions;
+-
+-    public SessionAuthMiddleware(RequestDelegate next, SessionStore sessions)
+-    {
+-        _next = next;
+-        _sessions = sessions;
+-    }
+-
+-    public async Task InvokeAsync(HttpContext context)
+-    {
+-        var path = context.Request.Path;
+-        var needsSession = path.StartsWithSegments("/api") && !path.StartsWithSegments("/api/auth/login");
+-
+-        if (needsSession)
+-        {
+-            var header = context.Request.Headers.Authorization.ToString();
+-            var token = header.StartsWith(BearerPrefix) ? header[BearerPrefix.Length..] : null;
+-            var session = _sessions.Get(token);
+-
+-            if (session is null)
+-            {
+-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+-                return;
+-            }
+-
+-            context.Items[HttpContextExtensions.SessionKey] = session;
+-        }
+-
+-        await _next(context);
+-    }
+-}
+-
+-public static class HttpContextExtensions
+-{
+-    public const string SessionKey = "session";
+-
+-    public static UserSession GetSession(this HttpContext context) =>
+-        (UserSession)context.Items[SessionKey]!;
+-}
+diff --git a/backend/src/InvoiceApp.Api/Auth/SessionStore.cs b/backend/src/InvoiceApp.Api/Auth/SessionStore.cs
+deleted file mode 100644
+index e05af86..0000000
+--- a/backend/src/InvoiceApp.Api/Auth/SessionStore.cs
++++ /dev/null
+@@ -1,22 +0,0 @@
+-using System.Collections.Concurrent;
+-using System.Security.Cryptography;
+-
+-namespace InvoiceApp.Api.Auth;
+-
+-/// <summary>Keeps signed-in sessions in memory, keyed by an opaque bearer token.</summary>
+-public class SessionStore
+-{
+-    private readonly ConcurrentDictionary<string, UserSession> _sessions = new();
+-
+-    public string Create(UserSession session)
+-    {
+-        var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(16));
+-        _sessions[token] = session;
+-        return token;
+-    }
+-
+-    public UserSession? Get(string? token) =>
+-        token is not null && _sessions.TryGetValue(token, out var session) ? session : null;
+-
+-    public void Remove(string token) => _sessions.TryRemove(token, out _);
+-}
+diff --git a/backend/src/InvoiceApp.Api/Auth/UserSession.cs b/backend/src/InvoiceApp.Api/Auth/UserSession.cs
+deleted file mode 100644
+index f69adea..0000000
+--- a/backend/src/InvoiceApp.Api/Auth/UserSession.cs
++++ /dev/null
+@@ -1,15 +0,0 @@
+-namespace InvoiceApp.Api.Auth;
+-
+-public record UserSession(string Username, string Role);
+-
+-public class DemoUser
+-{
+-    public string Username { get; set; } = string.Empty;
+-    public string Password { get; set; } = string.Empty;
+-    public string Role { get; set; } = string.Empty;
+-}
+-
+-public class DemoUsersOptions
+-{
+-    public List<DemoUser> Users { get; set; } = new();
+-}
+diff --git a/backend/src/InvoiceApp.Api/Controllers/ApiControllerBase.cs b/backend/src/InvoiceApp.Api/Controllers/ApiControllerBase.cs
+deleted file mode 100644
+index db3e15f..0000000
+--- a/backend/src/InvoiceApp.Api/Controllers/ApiControllerBase.cs
++++ /dev/null
+@@ -1,28 +0,0 @@
+-using InvoiceApp.Domain;
+-using Microsoft.AspNetCore.Mvc;
+-
+-namespace InvoiceApp.Api.Controllers;
+-
+-public abstract class ApiControllerBase : ControllerBase
+-{
+-    /// <summary>Runs a service call and maps its failures to HTTP status codes.</summary>
+-    protected ActionResult<Invoice> Handle(Func<Invoice> action)
+-    {
+-        try
+-        {
+-            return Ok(action());
+-        }
+-        catch (KeyNotFoundException ex)
+-        {
+-            return NotFound(new { error = ex.Message });
+-        }
+-        catch (InvalidOperationException ex)
+-        {
+-            return Conflict(new { error = ex.Message });
+-        }
+-        catch (ArgumentException ex)
+-        {
+-            return BadRequest(new { error = ex.Message });
+-        }
+-    }
+-}
+diff --git a/backend/src/InvoiceApp.Api/Controllers/ApprovalsController.cs b/backend/src/InvoiceApp.Api/Controllers/ApprovalsController.cs
+deleted file mode 100644
+index 90d1b39..0000000
+--- a/backend/src/InvoiceApp.Api/Controllers/ApprovalsController.cs
++++ /dev/null
+@@ -1,28 +0,0 @@
+-using InvoiceApp.Api.Auth;
+-using InvoiceApp.Domain;
+-using Microsoft.AspNetCore.Mvc;
+-
+-namespace InvoiceApp.Api.Controllers;
+-
+-[ApiController]
+-[Route("api/[controller]")]
+-[RequireRole("Approver", "Admin")]
+-public class ApprovalsController : ApiControllerBase
+-{
+-    private readonly ApprovalService _approvals;
+-
+-    public ApprovalsController(ApprovalService approvals)
+-    {
+-        _approvals = approvals;
+-    }
+-
+-    public record RejectRequest(string Reason);
+-
+-    [HttpPost("{invoiceId}/approve")]
+-    public ActionResult<Invoice> Approve(string invoiceId) =>
+-        Handle(() => _approvals.Approve(invoiceId, HttpContext.GetSession().Username));
+-
+-    [HttpPost("{invoiceId}/reject")]
+-    public ActionResult<Invoice> Reject(string invoiceId, [FromBody] RejectRequest request) =>
+-        Handle(() => _approvals.Reject(invoiceId, HttpContext.GetSession().Username, request.Reason));
+-}
+diff --git a/backend/src/InvoiceApp.Api/Controllers/AuthController.cs b/backend/src/InvoiceApp.Api/Controllers/AuthController.cs
+deleted file mode 100644
+index 89586c2..0000000
+--- a/backend/src/InvoiceApp.Api/Controllers/AuthController.cs
++++ /dev/null
+@@ -1,49 +0,0 @@
+-using InvoiceApp.Api.Auth;
+-using Microsoft.AspNetCore.Mvc;
+-using Microsoft.Extensions.Options;
+-
+-namespace InvoiceApp.Api.Controllers;
+-
+-[ApiController]
+-[Route("api/auth")]
+-public class AuthController : ControllerBase
+-{
+-    private readonly DemoUsersOptions _options;
+-    private readonly SessionStore _sessions;
+-
+-    public AuthController(IOptions<DemoUsersOptions> options, SessionStore sessions)
+-    {
+-        _options = options.Value;
+-        _sessions = sessions;
+-    }
+-
+-    public record LoginRequest(string Username, string Password);
+-    public record LoginResponse(string Token, string Username, string Role);
+-
+-    [HttpPost("login")]
+-    public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
+-    {
+-        var user = _options.Users.FirstOrDefault(u =>
+-            u.Username == request.Username && u.Password == request.Password);
+-
+-        if (user is null)
+-        {
+-            return Unauthorized(new { error = "Invalid username or password." });
+-        }
+-
+-        var token = _sessions.Create(new UserSession(user.Username, user.Role));
+-        return Ok(new LoginResponse(token, user.Username, user.Role));
+-    }
+-
+-    [HttpPost("logout")]
+-    public IActionResult Logout()
+-    {
+-        var header = Request.Headers.Authorization.ToString();
+-        if (header.StartsWith("Bearer "))
+-        {
+-            _sessions.Remove(header["Bearer ".Length..]);
+-        }
+-
+-        return NoContent();
+-    }
+-}
+diff --git a/backend/src/InvoiceApp.Api/Controllers/InvoicesController.cs b/backend/src/InvoiceApp.Api/Controllers/InvoicesController.cs
+deleted file mode 100644
+index 8f5b855..0000000
+--- a/backend/src/InvoiceApp.Api/Controllers/InvoicesController.cs
++++ /dev/null
+@@ -1,76 +0,0 @@
+-using InvoiceApp.Api.Auth;
+-using InvoiceApp.Domain;
+-using Microsoft.AspNetCore.Mvc;
+-
+-namespace InvoiceApp.Api.Controllers;
+-
+-[ApiController]
+-[Route("api/[controller]")]
+-public class InvoicesController : ApiControllerBase
+-{
+-    private readonly IInvoiceRepository _repository;
+-    private readonly ApprovalService _approvals;
+-
+-    public InvoicesController(IInvoiceRepository repository, ApprovalService approvals)
+-    {
+-        _repository = repository;
+-        _approvals = approvals;
+-    }
+-
+-    public record CreateInvoiceRequest(string CustomerName, decimal Amount);
+-
+-    [HttpGet]
+-    public ActionResult<IReadOnlyList<Invoice>> GetAll([FromQuery] string? status)
+-    {
+-        var invoices = _repository.GetAll();
+-
+-        if (!string.IsNullOrEmpty(status))
+-        {
+-            if (!Enum.TryParse<InvoiceStatus>(status, ignoreCase: true, out var parsed))
+-            {
+-                return BadRequest(new { error = $"Unknown status '{status}'." });
+-            }
+-
+-            invoices = invoices.Where(i => i.Status == parsed).ToList();
+-        }
+-
+-        return Ok(invoices);
+-    }
+-
+-    [HttpGet("{id}")]
+-    public ActionResult<Invoice> GetById(string id)
+-    {
+-        var invoice = _repository.GetById(id);
+-        return invoice is null ? NotFound() : Ok(invoice);
+-    }
+-
+-    [HttpPost]
+-    public ActionResult<Invoice> Create([FromBody] CreateInvoiceRequest request)
+-    {
+-        if (string.IsNullOrWhiteSpace(request.CustomerName))
+-        {
+-            return BadRequest(new { error = "Customer name is required." });
+-        }
+-
+-        if (request.Amount <= 0)
+-        {
+-            return BadRequest(new { error = "Amount must be greater than zero." });
+-        }
+-
+-        var invoice = _repository.Add(new Invoice
+-        {
+-            CustomerName = request.CustomerName.Trim(),
+-            Amount = request.Amount
+-        });
+-
+-        return CreatedAtAction(nameof(GetById), new { id = invoice.Id }, invoice);
+-    }
+-
+-    [HttpPost("{id}/submit")]
+-    public ActionResult<Invoice> Submit(string id) => Handle(() => _approvals.Submit(id));
+-
+-    [HttpDelete("{id}")]
+-    [RequireRole("Admin")]
+-    public IActionResult Delete(string id) =>
+-        _repository.Remove(id) ? NoContent() : NotFound();
+-}
+diff --git a/backend/src/InvoiceApp.Api/InMemoryInvoiceRepository.cs b/backend/src/InvoiceApp.Api/InMemoryInvoiceRepository.cs
+deleted file mode 100644
+index f51a0b6..0000000
+--- a/backend/src/InvoiceApp.Api/InMemoryInvoiceRepository.cs
++++ /dev/null
+@@ -1,63 +0,0 @@
+-using InvoiceApp.Domain;
+-
+-namespace InvoiceApp.Api;
+-
+-/// <summary>In-memory store so the demo app runs with no database. Seeded with a few invoices.</summary>
+-public class InMemoryInvoiceRepository : IInvoiceRepository
+-{
+-    private readonly object _lock = new();
+-    private int _nextNumber = 1006;
+-
+-    private readonly List<Invoice> _invoices = new()
+-    {
+-        new Invoice { Id = "INV-1001", CustomerName = "Lakeside School District", Amount = 4250.00m, Status = InvoiceStatus.PendingApproval },
+-        new Invoice { Id = "INV-1002", CustomerName = "Hilltop Academy", Amount = 980.50m, Status = InvoiceStatus.PendingApproval },
+-        new Invoice { Id = "INV-1003", CustomerName = "Riverside Charter", Amount = 12300.00m, Status = InvoiceStatus.Approved, DecidedBy = "demo.approver", DecidedAt = DateTime.UtcNow.AddDays(-2) },
+-        new Invoice { Id = "INV-1004", CustomerName = "Oakwood Independent", Amount = 615.75m, Status = InvoiceStatus.PendingApproval },
+-        new Invoice { Id = "INV-1005", CustomerName = "Maple Grove Prep", Amount = 310.00m, Status = InvoiceStatus.Draft },
+-    };
+-
+-    public IReadOnlyList<Invoice> GetAll()
+-    {
+-        lock (_lock) return _invoices.ToList();
+-    }
+-
+-    public Invoice? GetById(string id)
+-    {
+-        lock (_lock) return _invoices.FirstOrDefault(i => i.Id == id);
+-    }
+-
+-    public IReadOnlyList<Invoice> GetByIds(IEnumerable<string> ids)
+-    {
+-        var wanted = ids.ToHashSet();
+-        lock (_lock) return _invoices.Where(i => wanted.Contains(i.Id)).ToList();
+-    }
+-
+-    public Invoice Add(Invoice invoice)
+-    {
+-        lock (_lock)
+-        {
+-            if (string.IsNullOrEmpty(invoice.Id))
+-            {
+-                invoice.Id = $"INV-{_nextNumber++}";
+-            }
+-
+-            _invoices.Add(invoice);
+-            return invoice;
+-        }
+-    }
+-
+-    public void Update(Invoice invoice)
+-    {
+-        lock (_lock)
+-        {
+-            var index = _invoices.FindIndex(i => i.Id == invoice.Id);
+-            if (index >= 0) _invoices[index] = invoice;
+-        }
+-    }
+-
+-    public bool Remove(string id)
+-    {
+-        lock (_lock) return _invoices.RemoveAll(i => i.Id == id) > 0;
+-    }
+-}
+diff --git a/backend/src/InvoiceApp.Api/InvoiceApp.Api.csproj b/backend/src/InvoiceApp.Api/InvoiceApp.Api.csproj
+deleted file mode 100644
+index 1638735..0000000
+--- a/backend/src/InvoiceApp.Api/InvoiceApp.Api.csproj
++++ /dev/null
+@@ -1,10 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk.Web">
+-  <PropertyGroup>
+-    <TargetFramework>net8.0</TargetFramework>
+-    <Nullable>enable</Nullable>
+-    <ImplicitUsings>enable</ImplicitUsings>
+-  </PropertyGroup>
+-  <ItemGroup>
+-    <ProjectReference Include="..\InvoiceApp.Domain\InvoiceApp.Domain.csproj" />
+-  </ItemGroup>
+-</Project>
+diff --git a/backend/src/InvoiceApp.Api/Program.cs b/backend/src/InvoiceApp.Api/Program.cs
+deleted file mode 100644
+index 42524a7..0000000
+--- a/backend/src/InvoiceApp.Api/Program.cs
++++ /dev/null
+@@ -1,24 +0,0 @@
+-using System.Text.Json.Serialization;
+-using InvoiceApp.Api;
+-using InvoiceApp.Api.Auth;
+-using InvoiceApp.Domain;
+-
+-var builder = WebApplication.CreateBuilder(args);
+-
+-builder.Services
+-    .AddControllers()
+-    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+-
+-builder.Services.Configure<DemoUsersOptions>(builder.Configuration);
+-builder.Services.AddSingleton<SessionStore>();
+-builder.Services.AddSingleton<IInvoiceRepository, InMemoryInvoiceRepository>();
+-builder.Services.AddScoped<ApprovalService>();
+-
+-var app = builder.Build();
+-
+-app.UseDefaultFiles();
+-app.UseStaticFiles();
+-app.UseMiddleware<SessionAuthMiddleware>();
+-app.MapControllers();
+-
+-app.Run();
+diff --git a/backend/src/InvoiceApp.Api/Properties/launchSettings.json b/backend/src/InvoiceApp.Api/Properties/launchSettings.json
+deleted file mode 100644
+index 222f57e..0000000
+--- a/backend/src/InvoiceApp.Api/Properties/launchSettings.json
++++ /dev/null
+@@ -1,12 +0,0 @@
+-{
+-  "profiles": {
+-    "http": {
+-      "commandName": "Project",
+-      "launchBrowser": false,
+-      "applicationUrl": "http://localhost:5000",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    }
+-  }
+-}
+diff --git a/backend/src/InvoiceApp.Api/appsettings.json b/backend/src/InvoiceApp.Api/appsettings.json
+deleted file mode 100644
+index 4b4e63f..0000000
+--- a/backend/src/InvoiceApp.Api/appsettings.json
++++ /dev/null
+@@ -1,13 +0,0 @@
+-{
+-  "Logging": {
+-    "LogLevel": {
+-      "Default": "Information",
+-      "Microsoft.AspNetCore": "Warning"
+-    }
+-  },
+-  "AllowedHosts": "*",
+-  "Users": [
+-    { "Username": "demo.approver", "Password": "ChangeMe123!", "Role": "Approver" },
+-    { "Username": "demo.admin", "Password": "ChangeMe123!", "Role": "Admin" }
+-  ]
+-}
+diff --git a/backend/src/InvoiceApp.Domain/ApprovalService.cs b/backend/src/InvoiceApp.Domain/ApprovalService.cs
+deleted file mode 100644
+index 4b2ec92..0000000
+--- a/backend/src/InvoiceApp.Domain/ApprovalService.cs
++++ /dev/null
+@@ -1,73 +0,0 @@
+-namespace InvoiceApp.Domain;
+-
+-/// <summary>
+-/// Moves an invoice through its lifecycle: Draft -> PendingApproval -> Approved or Rejected.
+-/// One invoice at a time, decided as a whole by a single approver.
+-/// </summary>
+-public class ApprovalService
+-{
+-    private readonly IInvoiceRepository _repository;
+-
+-    public ApprovalService(IInvoiceRepository repository)
+-    {
+-        _repository = repository;
+-    }
+-
+-    public Invoice Submit(string invoiceId)
+-    {
+-        var invoice = Find(invoiceId);
+-
+-        if (invoice.Status != InvoiceStatus.Draft)
+-        {
+-            throw new InvalidOperationException(
+-                $"Invoice {invoiceId} is {invoice.Status}; only drafts can be submitted.");
+-        }
+-
+-        invoice.Status = InvoiceStatus.PendingApproval;
+-        _repository.Update(invoice);
+-        return invoice;
+-    }
+-
+-    public Invoice Approve(string invoiceId, string approver)
+-    {
+-        var invoice = Find(invoiceId);
+-        EnsurePending(invoice);
+-
+-        invoice.Status = InvoiceStatus.Approved;
+-        invoice.DecidedBy = approver;
+-        invoice.DecidedAt = DateTime.UtcNow;
+-        _repository.Update(invoice);
+-        return invoice;
+-    }
+-
+-    public Invoice Reject(string invoiceId, string approver, string reason)
+-    {
+-        if (string.IsNullOrWhiteSpace(reason))
+-        {
+-            throw new ArgumentException("A reason is required to reject an invoice.", nameof(reason));
+-        }
+-
+-        var invoice = Find(invoiceId);
+-        EnsurePending(invoice);
+-
+-        invoice.Status = InvoiceStatus.Rejected;
+-        invoice.DecidedBy = approver;
+-        invoice.DecidedAt = DateTime.UtcNow;
+-        invoice.DecisionNote = reason;
+-        _repository.Update(invoice);
+-        return invoice;
+-    }
+-
+-    private Invoice Find(string invoiceId) =>
+-        _repository.GetById(invoiceId)
+-        ?? throw new KeyNotFoundException($"Invoice {invoiceId} was not found.");
+-
+-    private static void EnsurePending(Invoice invoice)
+-    {
+-        if (invoice.Status != InvoiceStatus.PendingApproval)
+-        {
+-            throw new InvalidOperationException(
+-                $"Invoice {invoice.Id} is {invoice.Status}; only pending invoices can be decided.");
+-        }
+-    }
+-}
+diff --git a/backend/src/InvoiceApp.Domain/DiscountCalculator.cs b/backend/src/InvoiceApp.Domain/DiscountCalculator.cs
+deleted file mode 100644
+index 9733ba3..0000000
+--- a/backend/src/InvoiceApp.Domain/DiscountCalculator.cs
++++ /dev/null
+@@ -1,35 +0,0 @@
+-namespace InvoiceApp.Domain;
+-
+-/// <summary>Volume and loyalty discount rules used when pricing invoices.</summary>
+-public class DiscountCalculator
+-{
+-    public decimal QuantityDiscount(int quantity)
+-    {
+-        if (quantity >= 100) return 0.15m;
+-        if (quantity >= 50) return 0.10m;
+-        if (quantity >= 10) return 0.05m;
+-        return 0m;
+-    }
+-
+-    public decimal LoyaltyDiscount(int yearsAsCustomer)
+-    {
+-        return Math.Min(yearsAsCustomer * 0.01m, 0.10m);
+-    }
+-
+-    public decimal CombinedDiscount(int quantity, int yearsAsCustomer, string? customerType)
+-    {
+-        var discount = QuantityDiscount(quantity) + LoyaltyDiscount(yearsAsCustomer);
+-
+-        if (customerType == "Nonprofit")
+-        {
+-            discount += 0.05m;
+-        }
+-
+-        return discount;
+-    }
+-
+-    public decimal ApplyDiscount(decimal amount, decimal discountRate)
+-    {
+-        return Math.Round(amount * (1 - discountRate), 2);
+-    }
+-}
+diff --git a/backend/src/InvoiceApp.Domain/IInvoiceRepository.cs b/backend/src/InvoiceApp.Domain/IInvoiceRepository.cs
+deleted file mode 100644
+index 86a759e..0000000
+--- a/backend/src/InvoiceApp.Domain/IInvoiceRepository.cs
++++ /dev/null
+@@ -1,11 +0,0 @@
+-namespace InvoiceApp.Domain;
+-
+-public interface IInvoiceRepository
+-{
+-    IReadOnlyList<Invoice> GetAll();
+-    Invoice? GetById(string id);
+-    IReadOnlyList<Invoice> GetByIds(IEnumerable<string> ids);
+-    Invoice Add(Invoice invoice);
+-    void Update(Invoice invoice);
+-    bool Remove(string id);
+-}
+diff --git a/backend/src/InvoiceApp.Domain/Invoice.cs b/backend/src/InvoiceApp.Domain/Invoice.cs
+deleted file mode 100644
+index 4a9c767..0000000
+--- a/backend/src/InvoiceApp.Domain/Invoice.cs
++++ /dev/null
+@@ -1,13 +0,0 @@
+-namespace InvoiceApp.Domain;
+-
+-public class Invoice
+-{
+-    public string Id { get; set; } = string.Empty;
+-    public string CustomerName { get; set; } = string.Empty;
+-    public decimal Amount { get; set; }
+-    public InvoiceStatus Status { get; set; } = InvoiceStatus.Draft;
+-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+-    public string? DecidedBy { get; set; }
+-    public DateTime? DecidedAt { get; set; }
+-    public string? DecisionNote { get; set; }
+-}
+diff --git a/backend/src/InvoiceApp.Domain/InvoiceApp.Domain.csproj b/backend/src/InvoiceApp.Domain/InvoiceApp.Domain.csproj
+deleted file mode 100644
+index bfa77a1..0000000
+--- a/backend/src/InvoiceApp.Domain/InvoiceApp.Domain.csproj
++++ /dev/null
+@@ -1,7 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-  <PropertyGroup>
+-    <TargetFramework>net8.0</TargetFramework>
+-    <Nullable>enable</Nullable>
+-    <ImplicitUsings>enable</ImplicitUsings>
+-  </PropertyGroup>
+-</Project>
+diff --git a/backend/src/InvoiceApp.Domain/InvoiceStatus.cs b/backend/src/InvoiceApp.Domain/InvoiceStatus.cs
+deleted file mode 100644
+index 51c130d..0000000
+--- a/backend/src/InvoiceApp.Domain/InvoiceStatus.cs
++++ /dev/null
+@@ -1,9 +0,0 @@
+-namespace InvoiceApp.Domain;
+-
+-public enum InvoiceStatus
+-{
+-    Draft,
+-    PendingApproval,
+-    Approved,
+-    Rejected
+-}
+diff --git a/backend/src/invoice_app/__init__.py b/backend/src/invoice_app/__init__.py
+new file mode 100644
+index 0000000..35a1827
+--- /dev/null
++++ b/backend/src/invoice_app/__init__.py
+@@ -0,0 +1 @@
++"""Invoice approval application package."""
+diff --git a/backend/src/invoice_app/api/__init__.py b/backend/src/invoice_app/api/__init__.py
+new file mode 100644
+index 0000000..7773b6b
+--- /dev/null
++++ b/backend/src/invoice_app/api/__init__.py
+@@ -0,0 +1 @@
++"""API layer for the invoice approval app."""
+diff --git a/backend/src/invoice_app/api/auth.py b/backend/src/invoice_app/api/auth.py
+new file mode 100644
+index 0000000..3a6a771
+--- /dev/null
++++ b/backend/src/invoice_app/api/auth.py
+@@ -0,0 +1,91 @@
++from __future__ import annotations
++
++import secrets
++from dataclasses import dataclass
++
++from fastapi import APIRouter, HTTPException, Request
++from fastapi.responses import JSONResponse, Response
++
++from invoice_app.domain.models import Role
++
++DEMO_USERS: dict[str, Role] = {
++    "demo.manager": Role.MANAGER,
++    "demo.director": Role.DIRECTOR,
++    "demo.director2": Role.DIRECTOR,
++    "demo.admin": Role.ADMIN,
++}
++
++
++@dataclass(frozen=True)
++class UserSession:
++    username: str
++    role: Role
++
++
++class SessionStore:
++    def __init__(self) -> None:
++        self._sessions: dict[str, UserSession] = {}
++
++    def create(self, session: UserSession) -> str:
++        token = secrets.token_hex(16)
++        self._sessions[token] = session
++        return token
++
++    def get(self, token: str | None) -> UserSession | None:
++        if token is None:
++            return None
++        return self._sessions.get(token)
++
++    def remove(self, token: str | None) -> None:
++        if token is not None:
++            self._sessions.pop(token, None)
++
++
++async def get_session_from_request(request: Request) -> UserSession:
++    session = getattr(request.state, "session", None)
++    if session is None:
++        raise HTTPException(status_code=401, detail={"error": "Unauthorized"})
++    return session
++
++
++def require_role(*allowed_roles: str | Role):
++    allowed = {Role(role) if not isinstance(role, Role) else role for role in allowed_roles}
++
++    async def dependency(request: Request) -> UserSession:
++        session = getattr(request.state, "session", None)
++        if session is None:
++            raise HTTPException(status_code=401, detail={"error": "Unauthorized"})
++        if session.role not in allowed:
++            raise HTTPException(status_code=401, detail={"error": "Unauthorized"})
++        return session
++
++    return dependency
++
++
++auth_router = APIRouter(prefix="/api/auth")
++
++
++@auth_router.post("/login")
++async def login(request: Request) -> dict:
++    payload = await request.json()
++    username = payload.get("username")
++    password = payload.get("password")
++    demo_user = DEMO_USERS.get(username)
++
++    demo_user = DEMO_USERS.get(username)
++    if demo_user is not None and password == "ChangeMe123!":
++        role = demo_user
++    else:
++        return JSONResponse(status_code=401, content={"error": "Invalid username or password."})
++
++    token = request.app.state.session_store.create(UserSession(username=username, role=role))
++    return {"token": token, "username": username, "role": role}
++
++
++@auth_router.post("/logout")
++async def logout(request: Request) -> Response:
++    authorization = request.headers.get("authorization", "")
++    if authorization.startswith("Bearer "):
++        token = authorization.split(" ", 1)[1]
++        request.app.state.session_store.remove(token)
++    return Response(status_code=204)
+diff --git a/backend/src/invoice_app/api/in_memory_repository.py b/backend/src/invoice_app/api/in_memory_repository.py
+new file mode 100644
+index 0000000..fe635bd
+--- /dev/null
++++ b/backend/src/invoice_app/api/in_memory_repository.py
+@@ -0,0 +1,79 @@
++from __future__ import annotations
++
++from copy import deepcopy
++from datetime import UTC, datetime, timedelta
++from decimal import Decimal
++
++from invoice_app.domain.models import Invoice, InvoiceStatus
++from invoice_app.domain.repository import InvoiceRepository
++
++
++class InMemoryInvoiceRepository(InvoiceRepository):
++    """Simple in-memory repository for the demo app."""
++
++    def __init__(self) -> None:
++        self._next_number = 1006
++        now = datetime.now(UTC)
++        self._invoices = [
++            Invoice(
++                id="INV-1001",
++                customer_name="Lakeside School District",
++                amount=Decimal("4250.00"),
++                status=InvoiceStatus.PendingApproval,
++            ),
++            Invoice(
++                id="INV-1002",
++                customer_name="Hilltop Academy",
++                amount=Decimal("980.50"),
++                status=InvoiceStatus.PendingApproval,
++            ),
++            Invoice(
++                id="INV-1003",
++                customer_name="Riverside Charter",
++                amount=Decimal("12300.00"),
++                status=InvoiceStatus.Approved,
++                decided_by="demo.director",
++                decided_at=now - timedelta(days=2),
++            ),
++            Invoice(
++                id="INV-1004",
++                customer_name="Oakwood Independent",
++                amount=Decimal("615.75"),
++                status=InvoiceStatus.PendingApproval,
++            ),
++            Invoice(
++                id="INV-1005",
++                customer_name="Maple Grove Prep",
++                amount=Decimal("310.00"),
++                status=InvoiceStatus.Draft,
++            ),
++        ]
++
++    def get_all(self) -> list[Invoice]:
++        return [deepcopy(invoice) for invoice in self._invoices]
++
++    def get_by_id(self, invoice_id: str) -> Invoice | None:
++        for invoice in self._invoices:
++            if invoice.id == invoice_id:
++                return deepcopy(invoice)
++        return None
++
++    def add(self, invoice: Invoice) -> Invoice:
++        if not invoice.id:
++            invoice.id = f"INV-{self._next_number}"
++            self._next_number += 1
++        self._invoices.append(deepcopy(invoice))
++        return deepcopy(invoice)
++
++    def update(self, invoice: Invoice) -> None:
++        for index, current in enumerate(self._invoices):
++            if current.id == invoice.id:
++                self._invoices[index] = deepcopy(invoice)
++                return
++
++    def remove(self, invoice_id: str) -> bool:
++        for index, invoice in enumerate(self._invoices):
++            if invoice.id == invoice_id:
++                del self._invoices[index]
++                return True
++        return False
+diff --git a/backend/src/invoice_app/api/main.py b/backend/src/invoice_app/api/main.py
+new file mode 100644
+index 0000000..cb2435b
+--- /dev/null
++++ b/backend/src/invoice_app/api/main.py
+@@ -0,0 +1,178 @@
++from __future__ import annotations
++
++from decimal import Decimal
++from pathlib import Path
++from typing import Any
++
++from fastapi import Depends, FastAPI, Request
++from fastapi.responses import FileResponse, JSONResponse, Response
++from pydantic import BaseModel, ConfigDict, Field
++
++from invoice_app.api.auth import SessionStore, UserSession, auth_router, require_role
++from invoice_app.api.in_memory_repository import InMemoryInvoiceRepository
++from invoice_app.domain.approval_service import ApprovalService
++from invoice_app.domain.errors import ApprovalNotAllowed, InvalidInvoiceState, InvalidRequest, InvoiceNotFound
++from invoice_app.domain.models import Approver, Invoice, InvoiceStatus
++
++
++class CreateInvoiceRequest(BaseModel):
++    customer_name: str = Field(alias="customerName")
++    amount: Decimal
++
++    model_config = ConfigDict(populate_by_name=True)
++
++
++class RejectRequest(BaseModel):
++    reason: str
++
++
++app = FastAPI(title="Invoice Approvals")
++app.state.session_store = SessionStore()
++app.state.repository = InMemoryInvoiceRepository()
++app.state.approval_service = ApprovalService(app.state.repository)
++app.include_router(auth_router)
++
++
++@app.middleware("http")
++async def session_middleware(request: Request, call_next):
++    if request.url.path.startswith("/api") and request.url.path != "/api/auth/login":
++        token = None
++        header = request.headers.get("authorization", "")
++        if header.startswith("Bearer "):
++            token = header.split(" ", 1)[1]
++        session = request.app.state.session_store.get(token) if request.app.state.session_store else None
++        if session is None:
++            return JSONResponse(status_code=401, content={})
++        request.state.session = session
++    return await call_next(request)
++
++
++@app.exception_handler(InvoiceNotFound)
++async def invoice_not_found_handler(_, exc: InvoiceNotFound):
++    return JSONResponse(status_code=404, content={"error": str(exc)})
++
++
++@app.exception_handler(InvalidInvoiceState)
++async def invalid_invoice_state_handler(_, exc: InvalidInvoiceState):
++    return JSONResponse(status_code=409, content={"error": str(exc)})
++
++
++@app.exception_handler(InvalidRequest)
++async def invalid_request_handler(_, exc: InvalidRequest):
++    return JSONResponse(status_code=400, content={"error": str(exc)})
++
++
++@app.exception_handler(ApprovalNotAllowed)
++async def approval_not_allowed_handler(_, exc: ApprovalNotAllowed):
++    return JSONResponse(status_code=403, content={"error": str(exc)})
++
++
++static_dir = Path(__file__).resolve().parent / "static"
++
++
++@app.get("/")
++async def serve_root() -> FileResponse:
++    return FileResponse(static_dir / "index.html")
++
++
++@app.get("/index.html")
++async def serve_index() -> FileResponse:
++    return FileResponse(static_dir / "index.html")
++
++
++@app.get("/app.js")
++async def serve_app_js() -> FileResponse:
++    return FileResponse(static_dir / "app.js")
++
++
++@app.get("/styles.css")
++async def serve_styles() -> FileResponse:
++    return FileResponse(static_dir / "styles.css")
++
++
++def invoice_to_json(invoice: Invoice) -> dict[str, Any]:
++    return {
++        "id": invoice.id,
++        "customerName": invoice.customer_name,
++        "amount": float(invoice.amount),
++        "status": invoice.status.value,
++        "createdAt": invoice.created_at.isoformat().replace("+00:00", "Z"),
++        "decidedBy": invoice.decided_by,
++        "decidedAt": invoice.decided_at.isoformat().replace("+00:00", "Z") if invoice.decided_at else None,
++        "decisionNote": invoice.decision_note,
++        "approvals": [
++            {
++                "username": approval.username,
++                "role": approval.role.value,
++                "approvedAt": approval.approved_at.isoformat().replace("+00:00", "Z"),
++            }
++            for approval in invoice.approvals
++        ],
++    }
++
++
++@app.get("/api/invoices")
++def get_invoices(status: str | None = None):
++    invoices = app.state.repository.get_all()
++    if status:
++        try:
++            parsed_status = InvoiceStatus(status)
++        except ValueError as exc:
++            raise InvalidRequest(f"Unknown status '{status}'.") from exc
++        invoices = [invoice for invoice in invoices if invoice.status == parsed_status]
++    return [invoice_to_json(invoice) for invoice in invoices]
++
++
++@app.get("/api/invoices/{invoice_id}")
++def get_invoice(invoice_id: str):
++    invoice = app.state.repository.get_by_id(invoice_id)
++    if invoice is None:
++        raise InvoiceNotFound(f"Invoice {invoice_id} was not found.")
++    return invoice_to_json(invoice)
++
++
++@app.post("/api/invoices", status_code=201)
++def create_invoice(payload: CreateInvoiceRequest):
++    customer_name = payload.customer_name.strip() if payload.customer_name else ""
++    if not customer_name:
++        raise InvalidRequest("Customer name is required.")
++    if payload.amount <= 0:
++        raise InvalidRequest("Amount must be greater than zero.")
++
++    invoice = Invoice(customer_name=customer_name, amount=payload.amount)
++    created = app.state.repository.add(invoice)
++    response = JSONResponse(content=invoice_to_json(created), status_code=201)
++    response.headers["Location"] = f"/api/invoices/{created.id}"
++    return response
++
++
++@app.post("/api/invoices/{invoice_id}/submit")
++def submit_invoice(invoice_id: str):
++    invoice = app.state.approval_service.submit(invoice_id)
++    return invoice_to_json(invoice)
++
++
++@app.delete("/api/invoices/{invoice_id}")
++def delete_invoice(invoice_id: str, session: UserSession = Depends(require_role("Admin"))):
++    deleted = app.state.repository.remove(invoice_id)
++    if not deleted:
++        raise InvoiceNotFound(f"Invoice {invoice_id} was not found.")
++    return Response(status_code=204)
++
++
++@app.post("/api/approvals/{invoice_id}/approve")
++def approve_invoice(invoice_id: str, session: UserSession = Depends(require_role("Manager", "Director", "Admin"))):
++    approver = Approver(session.username, session.role)
++    invoice = app.state.approval_service.approve(invoice_id, approver)
++    return invoice_to_json(invoice)
++
++
++@app.post("/api/approvals/{invoice_id}/reject")
++def reject_invoice(
++    invoice_id: str,
++    payload: RejectRequest,
++    session: UserSession = Depends(require_role("Manager", "Director", "Admin")),
++):
++    approver = Approver(session.username, session.role)
++    invoice = app.state.approval_service.reject(invoice_id, approver, payload.reason)
++    return invoice_to_json(invoice)
+diff --git a/backend/src/InvoiceApp.Api/wwwroot/app.js b/backend/src/invoice_app/api/static/app.js
+similarity index 93%
+rename from backend/src/InvoiceApp.Api/wwwroot/app.js
+rename to backend/src/invoice_app/api/static/app.js
+index 9afda17..f2de821 100644
+--- a/backend/src/InvoiceApp.Api/wwwroot/app.js
++++ b/backend/src/invoice_app/api/static/app.js
+@@ -40,7 +40,7 @@
+   async function refresh() {
+     const invoices = await api('/invoices');
+     renderInvoices(invoices);
+-    renderPending(invoices.filter((i) => i.status === 'PendingApproval'));
++    renderPending(invoices.filter((i) => ['PendingApproval', 'AwaitingSecondApproval'].includes(i.status)));
+   }
+ 
+   function renderInvoices(invoices) {
+@@ -68,12 +68,14 @@
+       const approve = el('button', { type: 'button', 'aria-label': `Approve invoice ${invoice.id}` }, 'Approve');
+       const reject = el('button', { type: 'button', class: 'danger', 'aria-label': `Reject invoice ${invoice.id}` }, 'Reject');
+       const reason = el('input', { id: reasonId, 'aria-label': `Rejection reason for ${invoice.id}`, placeholder: 'Reason (required to reject)' });
++      const approvers = (invoice.approvals || []).map((approval) => approval.username).join(', ') || 'No approvals yet';
+ 
+       approve.addEventListener('click', () => decide(`/approvals/${invoice.id}/approve`, {}));
+       reject.addEventListener('click', () => decide(`/approvals/${invoice.id}/reject`, { reason: reason.value }));
+ 
+       return el('li', {},
+-        el('span', {}, `${invoice.id} · ${invoice.customerName} · ${money.format(invoice.amount)}`),
++        el('span', {}, `${invoice.id} · ${invoice.customerName} · ${money.format(invoice.amount)} · ${invoice.status.replace(/([a-z])([A-Z])/g, '$1 $2')}`),
++        el('span', {}, `Approved by: ${approvers}`),
+         el('span', {}, approve),
+         el('div', { class: 'reject-row' }, reason, reject));
+     }));
+diff --git a/backend/src/InvoiceApp.Api/wwwroot/index.html b/backend/src/invoice_app/api/static/index.html
+similarity index 100%
+rename from backend/src/InvoiceApp.Api/wwwroot/index.html
+rename to backend/src/invoice_app/api/static/index.html
+diff --git a/backend/src/InvoiceApp.Api/wwwroot/styles.css b/backend/src/invoice_app/api/static/styles.css
+similarity index 100%
+rename from backend/src/InvoiceApp.Api/wwwroot/styles.css
+rename to backend/src/invoice_app/api/static/styles.css
+diff --git a/backend/src/invoice_app/domain/__init__.py b/backend/src/invoice_app/domain/__init__.py
+new file mode 100644
+index 0000000..221c66c
+--- /dev/null
++++ b/backend/src/invoice_app/domain/__init__.py
+@@ -0,0 +1,12 @@
++from .approval_service import ApprovalService
++from .errors import InvalidInvoiceState, InvalidRequest, InvoiceNotFound
++from .models import Invoice, InvoiceStatus
++
++__all__ = [
++    "ApprovalService",
++    "InvalidInvoiceState",
++    "InvalidRequest",
++    "Invoice",
++    "InvoiceNotFound",
++    "InvoiceStatus",
++]
+diff --git a/backend/src/invoice_app/domain/approval_policy.py b/backend/src/invoice_app/domain/approval_policy.py
+new file mode 100644
+index 0000000..c7f4716
+--- /dev/null
++++ b/backend/src/invoice_app/domain/approval_policy.py
+@@ -0,0 +1,65 @@
++from __future__ import annotations
++
++from dataclasses import dataclass
++from decimal import Decimal
++
++from .models import Approver, Invoice, InvoiceStatus, Role
++
++MANAGER_LIMIT = Decimal("50000.00")
++DIRECTOR_LIMIT = Decimal("500000.00")
++
++
++@dataclass(frozen=True)
++class ApprovalDecision:
++    allowed: bool
++    reason: str | None = None
++
++
++def _format_amount(value: Decimal) -> str:
++    return f"{value:,.2f}"
++
++
++def _normalized_username(value: str) -> str:
++    return value.strip().casefold()
++
++
++def _already_approved(invoice: Invoice, username: str) -> bool:
++    normalized = _normalized_username(username)
++    return any(_normalized_username(record.username) == normalized for record in invoice.approvals)
++
++
++def evaluate_approval(invoice: Invoice, approver: Approver) -> ApprovalDecision:
++    role_name = approver.role.value
++    username = approver.username.strip()
++
++    if approver.role == Role.ADMIN:
++        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++
++    if approver.role not in {Role.MANAGER, Role.DIRECTOR}:
++        return ApprovalDecision(False, f"Role {role_name} cannot approve invoices.")
++
++    if invoice.status == InvoiceStatus.AwaitingSecondApproval:
++        if _already_approved(invoice, username):
++            return ApprovalDecision(
++                False,
++                f"{username} has already approved invoice {invoice.id}; the same user cannot count as both approvers.",
++            )
++        if approver.role != Role.DIRECTOR:
++            return ApprovalDecision(
++                False,
++                f"Invoices above 500,000.00 need a Director as the second approver; {username} is a {role_name}.",
++            )
++        return ApprovalDecision(True)
++
++    if approver.role == Role.MANAGER and invoice.amount > DIRECTOR_LIMIT:
++        return ApprovalDecision(True)
++
++    if approver.role == Role.MANAGER and invoice.amount > MANAGER_LIMIT:
++        amount_text = _format_amount(invoice.amount)
++        limit_text = _format_amount(MANAGER_LIMIT)
++        return ApprovalDecision(
++            False,
++            f"Invoice amount {amount_text} exceeds the Manager approval limit of {limit_text}.",
++        )
++
++    return ApprovalDecision(True)
+diff --git a/backend/src/invoice_app/domain/approval_service.py b/backend/src/invoice_app/domain/approval_service.py
+new file mode 100644
+index 0000000..0590218
+--- /dev/null
++++ b/backend/src/invoice_app/domain/approval_service.py
+@@ -0,0 +1,81 @@
++from __future__ import annotations
++
++from collections.abc import Callable
++from datetime import UTC, datetime
++
++from .approval_policy import evaluate_approval
++from .errors import ApprovalNotAllowed, InvalidInvoiceState, InvalidRequest, InvoiceNotFound
++from .models import ApprovalRecord, Approver, Invoice, InvoiceStatus
++from .repository import InvoiceRepository
++
++
++class ApprovalService:
++    def __init__(self, repository: InvoiceRepository, clock: Callable[[], datetime] | None = None):
++        self._repository = repository
++        self._clock = clock or (lambda: datetime.now(UTC))
++
++    def submit(self, invoice_id: str) -> Invoice:
++        invoice = self._find(invoice_id)
++        if invoice.status != InvoiceStatus.Draft:
++            raise InvalidInvoiceState(f"Invoice {invoice_id} is {invoice.status}; only drafts can be submitted.")
++
++        invoice.status = InvoiceStatus.PendingApproval
++        self._repository.update(invoice)
++        return invoice
++
++    def approve(self, invoice_id: str, approver: Approver) -> Invoice:
++        invoice = self._find(invoice_id)
++        self._ensure_approvable(invoice)
++
++        decision = evaluate_approval(invoice, approver)
++        if not decision.allowed:
++            raise ApprovalNotAllowed(decision.reason or "Approval is not allowed.")
++
++        approval_time = self._clock()
++        username = approver.username.strip()
++
++        if invoice.status == InvoiceStatus.AwaitingSecondApproval:
++            invoice.status = InvoiceStatus.Approved
++            invoice.decided_by = username
++            invoice.decided_at = approval_time
++        elif invoice.amount > 500000.00:
++            invoice.status = InvoiceStatus.AwaitingSecondApproval
++            invoice.decided_by = None
++            invoice.decided_at = None
++        else:
++            invoice.status = InvoiceStatus.Approved
++            invoice.decided_by = username
++            invoice.decided_at = approval_time
++
++        invoice.decision_note = None
++        invoice.approvals.append(ApprovalRecord(username=username, role=approver.role, approved_at=approval_time))
++        self._repository.update(invoice)
++        return invoice
++
++    def reject(self, invoice_id: str, approver: Approver, reason: str) -> Invoice:
++        if not reason or not reason.strip():
++            raise InvalidRequest("A reason is required to reject an invoice.")
++
++        invoice = self._find(invoice_id)
++        self._ensure_approvable(invoice)
++
++        rejected_at = self._clock()
++        invoice.status = InvoiceStatus.Rejected
++        invoice.decided_by = approver.username.strip()
++        invoice.decided_at = rejected_at
++        invoice.decision_note = reason
++        self._repository.update(invoice)
++        return invoice
++
++    def _find(self, invoice_id: str) -> Invoice:
++        invoice = self._repository.get_by_id(invoice_id)
++        if invoice is None:
++            raise InvoiceNotFound(f"Invoice {invoice_id} was not found.")
++        return invoice
++
++    @staticmethod
++    def _ensure_approvable(invoice: Invoice) -> None:
++        if invoice.status not in {InvoiceStatus.PendingApproval, InvoiceStatus.AwaitingSecondApproval}:
++            raise InvalidInvoiceState(
++                f"Invoice {invoice.id} is {invoice.status}; only pending invoices can be decided."
++            )
+diff --git a/backend/src/invoice_app/domain/errors.py b/backend/src/invoice_app/domain/errors.py
+new file mode 100644
+index 0000000..d4e9eda
+--- /dev/null
++++ b/backend/src/invoice_app/domain/errors.py
+@@ -0,0 +1,18 @@
++class InvoiceAppError(Exception):
++    """Base error for the invoice domain."""
++
++
++class InvoiceNotFound(InvoiceAppError):
++    """Raised when an invoice cannot be located."""
++
++
++class InvalidInvoiceState(InvoiceAppError):
++    """Raised when an action is invalid for the current invoice status."""
++
++
++class InvalidRequest(InvoiceAppError):
++    """Raised when an API request is malformed or invalid."""
++
++
++class ApprovalNotAllowed(InvoiceAppError):
++    """Raised when an approval attempt violates the approval policy."""
+diff --git a/backend/src/invoice_app/domain/models.py b/backend/src/invoice_app/domain/models.py
+new file mode 100644
+index 0000000..f90c0fe
+--- /dev/null
++++ b/backend/src/invoice_app/domain/models.py
+@@ -0,0 +1,46 @@
++from __future__ import annotations
++
++from dataclasses import dataclass, field
++from datetime import UTC, datetime
++from decimal import Decimal
++from enum import StrEnum
++
++
++class Role(StrEnum):
++    MANAGER = "Manager"
++    DIRECTOR = "Director"
++    ADMIN = "Admin"
++
++
++class InvoiceStatus(StrEnum):
++    Draft = "Draft"
++    PendingApproval = "PendingApproval"
++    AwaitingSecondApproval = "AwaitingSecondApproval"
++    Approved = "Approved"
++    Rejected = "Rejected"
++
++
++@dataclass(frozen=True)
++class Approver:
++    username: str
++    role: Role
++
++
++@dataclass(frozen=True)
++class ApprovalRecord:
++    username: str
++    role: Role
++    approved_at: datetime
++
++
++@dataclass
++class Invoice:
++    id: str = ""
++    customer_name: str = ""
++    amount: Decimal = Decimal(0)
++    status: InvoiceStatus = InvoiceStatus.Draft
++    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
++    decided_by: str | None = None
++    decided_at: datetime | None = None
++    decision_note: str | None = None
++    approvals: list[ApprovalRecord] = field(default_factory=list)
+diff --git a/backend/src/invoice_app/domain/repository.py b/backend/src/invoice_app/domain/repository.py
+new file mode 100644
+index 0000000..19c6f75
+--- /dev/null
++++ b/backend/src/invoice_app/domain/repository.py
+@@ -0,0 +1,18 @@
++from __future__ import annotations
++
++from typing import Protocol, runtime_checkable
++
++from .models import Invoice
++
++
++@runtime_checkable
++class InvoiceRepository(Protocol):
++    def get_all(self) -> list[Invoice]: ...
++
++    def get_by_id(self, invoice_id: str) -> Invoice | None: ...
++
++    def add(self, invoice: Invoice) -> Invoice: ...
++
++    def update(self, invoice: Invoice) -> None: ...
++
++    def remove(self, invoice_id: str) -> bool: ...
+diff --git a/backend/tests/InvoiceApp.Tests/ApprovalServiceTests.cs b/backend/tests/InvoiceApp.Tests/ApprovalServiceTests.cs
+deleted file mode 100644
+index 9be303d..0000000
+--- a/backend/tests/InvoiceApp.Tests/ApprovalServiceTests.cs
++++ /dev/null
+@@ -1,78 +0,0 @@
+-using InvoiceApp.Domain;
+-using Xunit;
+-
+-namespace InvoiceApp.Tests;
+-
+-public class ApprovalServiceTests
+-{
+-    private static Invoice InvoiceWith(string id, InvoiceStatus status) =>
+-        new() { Id = id, CustomerName = "Test School", Amount = 100m, Status = status };
+-
+-    private static ApprovalService ServiceFor(params Invoice[] invoices) =>
+-        new(new FakeInvoiceRepository(invoices));
+-
+-    [Fact]
+-    public void Submit_MovesDraftToPendingApproval()
+-    {
+-        var invoice = InvoiceWith("INV-1", InvoiceStatus.Draft);
+-
+-        var result = ServiceFor(invoice).Submit("INV-1");
+-
+-        Assert.Equal(InvoiceStatus.PendingApproval, result.Status);
+-    }
+-
+-    [Fact]
+-    public void Submit_RejectsInvoiceThatIsNotADraft()
+-    {
+-        var service = ServiceFor(InvoiceWith("INV-1", InvoiceStatus.Approved));
+-
+-        Assert.Throws<InvalidOperationException>(() => service.Submit("INV-1"));
+-    }
+-
+-    [Fact]
+-    public void Approve_SetsStatusApproverAndTimestamp()
+-    {
+-        var service = ServiceFor(InvoiceWith("INV-1", InvoiceStatus.PendingApproval));
+-
+-        var result = service.Approve("INV-1", "demo.approver");
+-
+-        Assert.Equal(InvoiceStatus.Approved, result.Status);
+-        Assert.Equal("demo.approver", result.DecidedBy);
+-        Assert.NotNull(result.DecidedAt);
+-    }
+-
+-    [Fact]
+-    public void Approve_RejectsInvoiceThatIsStillADraft()
+-    {
+-        var service = ServiceFor(InvoiceWith("INV-1", InvoiceStatus.Draft));
+-
+-        Assert.Throws<InvalidOperationException>(() => service.Approve("INV-1", "demo.approver"));
+-    }
+-
+-    [Fact]
+-    public void Approve_ThrowsWhenInvoiceDoesNotExist()
+-    {
+-        var service = ServiceFor();
+-
+-        Assert.Throws<KeyNotFoundException>(() => service.Approve("INV-404", "demo.approver"));
+-    }
+-
+-    [Fact]
+-    public void Reject_RecordsReasonAndApprover()
+-    {
+-        var service = ServiceFor(InvoiceWith("INV-1", InvoiceStatus.PendingApproval));
+-
+-        var result = service.Reject("INV-1", "demo.approver", "Duplicate invoice");
+-
+-        Assert.Equal(InvoiceStatus.Rejected, result.Status);
+-        Assert.Equal("Duplicate invoice", result.DecisionNote);
+-    }
+-
+-    [Fact]
+-    public void Reject_RequiresAReason()
+-    {
+-        var service = ServiceFor(InvoiceWith("INV-1", InvoiceStatus.PendingApproval));
+-
+-        Assert.Throws<ArgumentException>(() => service.Reject("INV-1", "demo.approver", "  "));
+-    }
+-}
+diff --git a/backend/tests/InvoiceApp.Tests/FakeInvoiceRepository.cs b/backend/tests/InvoiceApp.Tests/FakeInvoiceRepository.cs
+deleted file mode 100644
+index 1db73e4..0000000
+--- a/backend/tests/InvoiceApp.Tests/FakeInvoiceRepository.cs
++++ /dev/null
+@@ -1,17 +0,0 @@
+-using InvoiceApp.Domain;
+-
+-namespace InvoiceApp.Tests;
+-
+-internal class FakeInvoiceRepository : IInvoiceRepository
+-{
+-    private readonly List<Invoice> _invoices = new();
+-
+-    public FakeInvoiceRepository(params Invoice[] seed) => _invoices.AddRange(seed);
+-
+-    public IReadOnlyList<Invoice> GetAll() => _invoices.ToList();
+-    public Invoice? GetById(string id) => _invoices.FirstOrDefault(i => i.Id == id);
+-    public IReadOnlyList<Invoice> GetByIds(IEnumerable<string> ids) => _invoices.Where(i => ids.Contains(i.Id)).ToList();
+-    public Invoice Add(Invoice invoice) { _invoices.Add(invoice); return invoice; }
+-    public void Update(Invoice invoice) { }
+-    public bool Remove(string id) => _invoices.RemoveAll(i => i.Id == id) > 0;
+-}
+diff --git a/backend/tests/InvoiceApp.Tests/InvoiceApp.Tests.csproj b/backend/tests/InvoiceApp.Tests/InvoiceApp.Tests.csproj
+deleted file mode 100644
+index 93cb862..0000000
+--- a/backend/tests/InvoiceApp.Tests/InvoiceApp.Tests.csproj
++++ /dev/null
+@@ -1,17 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-  <PropertyGroup>
+-    <TargetFramework>net8.0</TargetFramework>
+-    <Nullable>enable</Nullable>
+-    <ImplicitUsings>enable</ImplicitUsings>
+-    <IsPackable>false</IsPackable>
+-  </PropertyGroup>
+-  <ItemGroup>
+-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+-    <PackageReference Include="xunit" Version="2.9.2" />
+-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+-    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+-  </ItemGroup>
+-  <ItemGroup>
+-    <ProjectReference Include="..\..\src\InvoiceApp.Domain\InvoiceApp.Domain.csproj" />
+-  </ItemGroup>
+-</Project>
+diff --git a/backend/tests/conftest.py b/backend/tests/conftest.py
+new file mode 100644
+index 0000000..9f8d7d1
+--- /dev/null
++++ b/backend/tests/conftest.py
+@@ -0,0 +1 @@
++"""Shared test configuration."""
+diff --git a/backend/tests/fakes.py b/backend/tests/fakes.py
+new file mode 100644
+index 0000000..baa537d
+--- /dev/null
++++ b/backend/tests/fakes.py
+@@ -0,0 +1,32 @@
++from __future__ import annotations
++
++from copy import deepcopy
++
++from invoice_app.domain.models import Invoice
++
++
++class FakeInvoiceRepository:
++    def __init__(self, invoices: list[Invoice] | None = None) -> None:
++        self._invoices = {invoice.id: deepcopy(invoice) for invoice in (invoices or [])}
++        self.update_calls = 0
++
++    def get_all(self) -> list[Invoice]:
++        return [deepcopy(invoice) for invoice in self._invoices.values()]
++
++    def get_by_id(self, invoice_id: str) -> Invoice | None:
++        invoice = self._invoices.get(invoice_id)
++        return deepcopy(invoice) if invoice is not None else None
++
++    def add(self, invoice: Invoice) -> Invoice:
++        saved = deepcopy(invoice)
++        if not saved.id:
++            saved.id = f"INV-{len(self._invoices) + 1}"
++        self._invoices[saved.id] = deepcopy(saved)
++        return deepcopy(saved)
++
++    def update(self, invoice: Invoice) -> None:
++        self.update_calls += 1
++        self._invoices[invoice.id] = deepcopy(invoice)
++
++    def remove(self, invoice_id: str) -> bool:
++        return self._invoices.pop(invoice_id, None) is not None
+diff --git a/backend/tests/test_approval_policy_increment_1.py b/backend/tests/test_approval_policy_increment_1.py
+new file mode 100644
+index 0000000..7e52e3b
+--- /dev/null
++++ b/backend/tests/test_approval_policy_increment_1.py
+@@ -0,0 +1,218 @@
++from __future__ import annotations
++
++import re
++from datetime import UTC, datetime
++from decimal import Decimal
++
++import pytest
++from fastapi.testclient import TestClient
++
++from invoice_app.api.auth import SessionStore, UserSession
++from invoice_app.api.in_memory_repository import InMemoryInvoiceRepository
++from invoice_app.api.main import app
++from invoice_app.domain.approval_policy import evaluate_approval
++from invoice_app.domain.approval_service import ApprovalService
++from invoice_app.domain.errors import ApprovalNotAllowed
++from invoice_app.domain.models import ApprovalRecord, Approver, Invoice, InvoiceStatus, Role
++
++from fakes import FakeInvoiceRepository
++
++FIXED_NOW = datetime(2024, 1, 15, 12, 0, tzinfo=UTC)
++
++
++def make_service(invoice: Invoice) -> tuple[ApprovalService, FakeInvoiceRepository]:
++    repository = FakeInvoiceRepository([invoice])
++    service = ApprovalService(repository, clock=lambda: FIXED_NOW)
++    return service, repository
++
++
++def invoice_for(amount: str, invoice_id: str = "INV-1") -> Invoice:
++    return Invoice(
++        id=invoice_id,
++        customer_name="Test School",
++        amount=Decimal(amount),
++        status=InvoiceStatus.PendingApproval,
++    )
++
++
++def test_manager_can_approve_up_to_and_including_50000() -> None:
++    """FR-001: Manager approval within the 50,000.00 limit."""
++    service, repository = make_service(invoice_for("0.01"))
++    approver = Approver("priya.sharma", Role.MANAGER)
++
++    result = service.approve("INV-1", approver)
++
++    assert result.status == InvoiceStatus.Approved
++    assert result.decided_by == "priya.sharma"
++    assert result.decided_at == FIXED_NOW
++    assert repository.update_calls == 1
++
++
++@pytest.mark.parametrize("amount", ["50000.00"])
++def test_manager_can_approve_boundary_amount(amount: str) -> None:
++    """FR-001: Manager can approve the exact 50,000.00 boundary."""
++    service, repository = make_service(invoice_for(amount))
++    approver = Approver("priya.sharma", Role.MANAGER)
++
++    result = service.approve("INV-1", approver)
++
++    assert result.status == InvoiceStatus.Approved
++    assert result.decided_by == "priya.sharma"
++    assert result.decided_at == FIXED_NOW
++    assert repository.update_calls == 1
++
++
++def test_manager_cannot_approve_amount_above_limit() -> None:
++    """FR-002: Manager approval is refused above 50,000.00."""
++    invoice = invoice_for("50000.01")
++    service, repository = make_service(invoice)
++    original = repository.get_by_id("INV-1")
++    approver = Approver("priya.sharma", Role.MANAGER)
++    expected = "Invoice amount 50,000.01 exceeds the Manager approval limit of 50,000.00."
++
++    with pytest.raises(ApprovalNotAllowed, match=re.escape(expected)):
++        service.approve("INV-1", approver)
++
++    assert repository.update_calls == 0
++    assert repository.get_by_id("INV-1") == original
++
++
++def test_manager_cannot_approve_exact_director_limit() -> None:
++    """FR-002: A Manager remains subject to the Manager limit at 500,000.00."""
++    invoice = invoice_for("500000.00")
++    service, repository = make_service(invoice)
++    original = repository.get_by_id("INV-1")
++    expected = "Invoice amount 500,000.00 exceeds the Manager approval limit of 50,000.00."
++
++    with pytest.raises(ApprovalNotAllowed, match=f"^{re.escape(expected)}$"):
++        service.approve("INV-1", Approver("priya.sharma", Role.MANAGER))
++
++    assert repository.update_calls == 0
++    assert repository.get_by_id("INV-1") == original
++
++
++def test_admin_policy_refusal_returns_false() -> None:
++    decision = evaluate_approval(invoice_for("100.00"), Approver("alex.chen", Role.ADMIN))
++
++    assert decision.allowed is False
++    assert decision.reason == "Role Admin cannot approve invoices."
++
++
++def test_same_user_policy_refusal_returns_false() -> None:
++    invoice = invoice_for("500000.01")
++    invoice.status = InvoiceStatus.AwaitingSecondApproval
++    invoice.approvals = [
++        ApprovalRecord(username="charlotte.ward", role=Role.DIRECTOR, approved_at=FIXED_NOW),
++    ]
++
++    decision = evaluate_approval(invoice, Approver("CHARLOTTE.WARD", Role.DIRECTOR))
++
++    assert decision.allowed is False
++    assert decision.reason == (
++        "CHARLOTTE.WARD has already approved invoice INV-1; the same user cannot count as both approvers."
++    )
++
++
++def test_manager_second_approval_policy_refusal_returns_false() -> None:
++    invoice = invoice_for("500000.01")
++    invoice.status = InvoiceStatus.AwaitingSecondApproval
++    invoice.approvals = [
++        ApprovalRecord(username="maria.chen", role=Role.MANAGER, approved_at=FIXED_NOW),
++    ]
++
++    decision = evaluate_approval(invoice, Approver("nina.patel", Role.MANAGER))
++
++    assert decision.allowed is False
++    assert decision.reason == (
++        "Invoices above 500,000.00 need a Director as the second approver; nina.patel is a Manager."
++    )
++
++
++def test_manager_limit_policy_refusal_returns_false() -> None:
++    decision = evaluate_approval(invoice_for("50000.01"), Approver("priya.sharma", Role.MANAGER))
++
++    assert decision.allowed is False
++    assert decision.reason == "Invoice amount 50,000.01 exceeds the Manager approval limit of 50,000.00."
++
++
++def test_director_can_approve_up_to_and_including_500000() -> None:
++    """FR-003: Director approval within the 500,000.00 limit."""
++    service, repository = make_service(invoice_for("500000.00"))
++    approver = Approver("rajesh.lee", Role.DIRECTOR)
++
++    result = service.approve("INV-1", approver)
++
++    assert result.status == InvoiceStatus.Approved
++    assert result.decided_by == "rajesh.lee"
++    assert result.decided_at == FIXED_NOW
++    assert repository.update_calls == 1
++
++
++def test_director_approval_above_limit_starts_second_approval_flow() -> None:
++    """FR-003 / FR-008: A Director can begin the second-approval flow above 500,000.00."""
++    invoice = invoice_for("500000.01")
++    service, repository = make_service(invoice)
++    approver = Approver("rajesh.lee", Role.DIRECTOR)
++
++    result = service.approve("INV-1", approver)
++
++    assert result.status == InvoiceStatus.AwaitingSecondApproval
++    assert result.decided_by is None
++    assert result.decided_at is None
++    assert len(result.approvals) == 1
++    assert repository.update_calls == 1
++
++
++def test_admin_cannot_approve_invoice() -> None:
++    """FR-012: Admin users are refused every approval attempt."""
++    invoice = invoice_for("100.00")
++    service, repository = make_service(invoice)
++    original = repository.get_by_id("INV-1")
++    approver = Approver("alex.chen", Role.ADMIN)
++    expected = "Role Admin cannot approve invoices."
++
++    with pytest.raises(ApprovalNotAllowed, match=re.escape(expected)):
++        service.approve("INV-1", approver)
++
++    assert repository.update_calls == 0
++    assert repository.get_by_id("INV-1") == original
++
++
++def test_admin_approval_above_director_limit_is_refused() -> None:
++    """FR-012: Admin users are still refused even when the invoice is above 500,000.00."""
++    invoice = invoice_for("500000.01")
++    service, repository = make_service(invoice)
++    original = repository.get_by_id("INV-1")
++    approver = Approver("alex.chen", Role.ADMIN)
++
++    with pytest.raises(ApprovalNotAllowed):
++        service.approve("INV-1", approver)
++
++    assert repository.update_calls == 0
++    assert repository.get_by_id("INV-1") == original
++
++
++def test_manager_refusal_returns_403_and_error_payload() -> None:
++    """FR-014: API returns 403 with the refusal reason on a Manager limit breach."""
++    app.state.session_store = SessionStore()
++    app.state.repository = InMemoryInvoiceRepository()
++    app.state.approval_service = ApprovalService(app.state.repository, clock=lambda: FIXED_NOW)
++
++    invoice = Invoice(
++        id="INV-API-1",
++        customer_name="Test School",
++        amount=Decimal("50000.01"),
++        status=InvoiceStatus.PendingApproval,
++    )
++    app.state.repository.add(invoice)
++    token = app.state.session_store.create(UserSession(username="priya.sharma", role=Role.MANAGER))
++    expected = {"error": "Invoice amount 50,000.01 exceeds the Manager approval limit of 50,000.00."}
++
++    client = TestClient(app)
++    response = client.post(
++        f"/api/approvals/{invoice.id}/approve",
++        headers={"Authorization": f"Bearer {token}"},
++    )
++
++    assert response.status_code == 403
++    assert response.json() == expected
+diff --git a/backend/tests/test_approval_service.py b/backend/tests/test_approval_service.py
+new file mode 100644
+index 0000000..ffed102
+--- /dev/null
++++ b/backend/tests/test_approval_service.py
+@@ -0,0 +1,116 @@
++from __future__ import annotations
++
++import re
++from datetime import UTC, datetime
++
++import pytest
++
++from invoice_app.domain.approval_policy import ApprovalDecision
++from invoice_app.domain.approval_service import ApprovalService
++from invoice_app.domain.errors import ApprovalNotAllowed, InvalidInvoiceState, InvalidRequest, InvoiceNotFound
++from invoice_app.domain.models import Approver, Invoice, InvoiceStatus, Role
++
++from fakes import FakeInvoiceRepository
++
++
++def invoice_with(invoice_id: str, status: InvoiceStatus) -> Invoice:
++    return Invoice(id=invoice_id, customer_name="Test School", amount=100, status=status)
++
++
++def service_for(*invoices: Invoice, fixed_time: datetime | None = None) -> ApprovalService:
++    clock = (lambda: fixed_time) if fixed_time is not None else None
++    return ApprovalService(FakeInvoiceRepository(list(invoices)), clock=clock)
++
++
++def test_submit_moves_draft_to_pending_approval() -> None:
++    invoice = invoice_with("INV-1", InvoiceStatus.Draft)
++
++    result = service_for(invoice).submit("INV-1")
++
++    assert result.status == InvoiceStatus.PendingApproval
++
++
++def test_submit_rejects_invoice_that_is_not_a_draft() -> None:
++    service = service_for(invoice_with("INV-1", InvoiceStatus.Approved))
++
++    expected = "Invoice INV-1 is Approved; only drafts can be submitted."
++    with pytest.raises(InvalidInvoiceState, match=f"^{re.escape(expected)}$"):
++        service.submit("INV-1")
++
++
++def test_approve_sets_status_approver_and_timestamp() -> None:
++    fixed_time = datetime(2024, 1, 15, 12, 0, tzinfo=UTC)
++    invoice = invoice_with("INV-1", InvoiceStatus.PendingApproval)
++    invoice.decision_note = "Previous decision"
++    service = service_for(invoice, fixed_time=fixed_time)
++    approver = Approver("demo.manager", Role.MANAGER)
++
++    result = service.approve("INV-1", approver)
++
++    assert result.status == InvoiceStatus.Approved
++    assert result.decided_by == "demo.manager"
++    assert result.decided_at == fixed_time
++    assert result.decision_note is None
++    assert result.approvals[0].approved_at == fixed_time
++
++
++def test_approve_rejects_invoice_that_is_still_a_draft() -> None:
++    service = service_for(invoice_with("INV-1", InvoiceStatus.Draft))
++
++    expected = "Invoice INV-1 is Draft; only pending invoices can be decided."
++    with pytest.raises(InvalidInvoiceState, match=f"^{re.escape(expected)}$"):
++        service.approve("INV-1", Approver("demo.manager", Role.MANAGER))
++
++
++def test_approve_throws_when_invoice_does_not_exist() -> None:
++    service = service_for()
++
++    with pytest.raises(InvoiceNotFound, match=f"^{re.escape('Invoice INV-404 was not found.')}$"):
++        service.approve("INV-404", Approver("demo.manager", Role.MANAGER))
++
++
++def test_approve_uses_utc_clock_when_no_clock_is_injected() -> None:
++    repository = FakeInvoiceRepository([invoice_with("INV-1", InvoiceStatus.PendingApproval)])
++    service = ApprovalService(repository)
++
++    result = service.approve("INV-1", Approver("demo.manager", Role.MANAGER))
++
++    assert result.decided_at is not None
++    assert result.decided_at.tzinfo == UTC
++    assert result.approvals[0].approved_at is not None
++    assert result.approvals[0].approved_at.tzinfo == UTC
++
++
++def test_approve_uses_fallback_reason_when_policy_reason_is_missing(monkeypatch: pytest.MonkeyPatch) -> None:
++    invoice = invoice_with("INV-1", InvoiceStatus.PendingApproval)
++    repository = FakeInvoiceRepository([invoice])
++    service = ApprovalService(repository)
++    original = repository.get_by_id("INV-1")
++    monkeypatch.setattr(
++        "invoice_app.domain.approval_service.evaluate_approval",
++        lambda *_: ApprovalDecision(False),
++    )
++    expected = "Approval is not allowed."
++
++    with pytest.raises(ApprovalNotAllowed, match=f"^{re.escape(expected)}$"):
++        service.approve("INV-1", Approver("demo.manager", Role.MANAGER))
++
++    assert repository.update_calls == 0
++    assert repository.get_by_id("INV-1") == original
++
++
++def test_reject_records_reason_and_approver() -> None:
++    service = service_for(invoice_with("INV-1", InvoiceStatus.PendingApproval))
++
++    result = service.reject("INV-1", Approver("demo.manager", Role.MANAGER), "Duplicate invoice")
++
++    assert result.status == InvoiceStatus.Rejected
++    assert result.decision_note == "Duplicate invoice"
++
++
++def test_reject_requires_a_reason() -> None:
++    service = service_for(invoice_with("INV-1", InvoiceStatus.PendingApproval))
++
++    expected = "A reason is required to reject an invoice."
++    with pytest.raises(InvalidRequest, match=f"^{re.escape(expected)}$"):
++        service.reject("INV-1", Approver("demo.manager", Role.MANAGER), "  ")
+diff --git a/backend/tests/test_two_approver_rule.py b/backend/tests/test_two_approver_rule.py
+new file mode 100644
+index 0000000..354ce84
+--- /dev/null
++++ b/backend/tests/test_two_approver_rule.py
+@@ -0,0 +1,194 @@
++from __future__ import annotations
++
++import re
++from datetime import UTC, datetime
++from decimal import Decimal
++
++import pytest
++
++from invoice_app.domain.approval_service import ApprovalService
++from invoice_app.domain.errors import ApprovalNotAllowed
++from invoice_app.domain.models import ApprovalRecord, Approver, Invoice, InvoiceStatus, Role
++
++from fakes import FakeInvoiceRepository
++
++FIXED_NOW = datetime(2024, 1, 15, 12, 0, tzinfo=UTC)
++
++
++def make_service(invoice: Invoice) -> tuple[ApprovalService, FakeInvoiceRepository]:
++    repository = FakeInvoiceRepository([invoice])
++    service = ApprovalService(repository, clock=lambda: FIXED_NOW)
++    return service, repository
++
++
++def invoice_for(
++    amount: str, invoice_id: str = "INV-2", status: InvoiceStatus = InvoiceStatus.PendingApproval
++) -> Invoice:
++    return Invoice(
++        id=invoice_id,
++        customer_name="Test School",
++        amount=Decimal(amount),
++        status=status,
++    )
++
++
++@pytest.mark.parametrize(
++    ("approver_role", "approver_username"),
++    [
++        (Role.MANAGER, "maria.chen"),
++        (Role.DIRECTOR, "sophia.ng"),
++    ],
++)
++def test_first_approval_for_high_value_invoice_is_recorded_and_waits_for_second_approver(
++    approver_role: Role, approver_username: str
++) -> None:
++    service, repository = make_service(invoice_for("500000.01"))
++    approver = Approver(approver_username, approver_role)
++
++    result = service.approve("INV-2", approver)
++
++    assert result.status == InvoiceStatus.AwaitingSecondApproval
++    assert result.decided_by is None
++    assert result.decided_at is None
++    assert len(result.approvals) == 1
++    assert result.approvals[0].username == approver_username
++    assert result.approvals[0].role == approver_role
++    assert repository.update_calls == 1
++    assert repository.get_by_id("INV-2") == result
++
++
++def test_exactly_500000_still_requires_only_one_director() -> None:
++    service, repository = make_service(invoice_for("500000.00"))
++    approver = Approver("sophia.ng", Role.DIRECTOR)
++
++    result = service.approve("INV-2", approver)
++
++    assert result.status == InvoiceStatus.Approved
++    assert result.decided_by == "sophia.ng"
++    assert result.decided_at == FIXED_NOW
++    assert repository.update_calls == 1
++
++
++def test_second_approval_refuses_same_director_exact_match() -> None:
++    invoice = invoice_for("500000.01")
++    invoice.status = InvoiceStatus.AwaitingSecondApproval
++    invoice.approvals = [
++        ApprovalRecord(username="charlotte.ward", role=Role.DIRECTOR, approved_at=FIXED_NOW),
++    ]
++    service, repository = make_service(invoice)
++    original = repository.get_by_id("INV-2")
++    approver = Approver("charlotte.ward", Role.DIRECTOR)
++    expected = "charlotte.ward has already approved invoice INV-2; the same user cannot count as both approvers."
++
++    with pytest.raises(ApprovalNotAllowed, match=re.escape(expected)):
++        service.approve("INV-2", approver)
++
++    assert repository.update_calls == 0
++    assert repository.get_by_id("INV-2") == original
++
++
++def test_second_approval_refuses_same_director_with_different_case() -> None:
++    invoice = invoice_for("500000.01")
++    invoice.status = InvoiceStatus.AwaitingSecondApproval
++    invoice.approvals = [
++        ApprovalRecord(username="charlotte.ward", role=Role.DIRECTOR, approved_at=FIXED_NOW),
++    ]
++    service, repository = make_service(invoice)
++    original = repository.get_by_id("INV-2")
++    approver = Approver("CHARLOTTE.WARD", Role.DIRECTOR)
++    expected = "CHARLOTTE.WARD has already approved invoice INV-2; the same user cannot count as both approvers."
++
++    with pytest.raises(ApprovalNotAllowed, match=re.escape(expected)):
++        service.approve("INV-2", approver)
++
++    assert repository.update_calls == 0
++    assert repository.get_by_id("INV-2") == original
++
++
++def test_second_approval_refuses_same_director_with_surrounding_whitespace() -> None:
++    invoice = invoice_for("500000.01")
++    invoice.status = InvoiceStatus.AwaitingSecondApproval
++    invoice.approvals = [
++        ApprovalRecord(username="charlotte.ward", role=Role.DIRECTOR, approved_at=FIXED_NOW),
++    ]
++    service, repository = make_service(invoice)
++    original = repository.get_by_id("INV-2")
++    approver = Approver("  charlotte.ward  ", Role.DIRECTOR)
++    expected = "charlotte.ward has already approved invoice INV-2; the same user cannot count as both approvers."
++
++    with pytest.raises(ApprovalNotAllowed, match=re.escape(expected)):
++        service.approve("INV-2", approver)
++
++    assert repository.update_calls == 0
++    assert repository.get_by_id("INV-2") == original
++
++
++def test_second_approval_refuses_manager_second_approver() -> None:
++    invoice = invoice_for("500000.01")
++    invoice.status = InvoiceStatus.AwaitingSecondApproval
++    invoice.approvals = [
++        ApprovalRecord(username="maria.chen", role=Role.MANAGER, approved_at=FIXED_NOW),
++    ]
++    service, repository = make_service(invoice)
++    original = repository.get_by_id("INV-2")
++    approver = Approver("evan.morris", Role.MANAGER)
++    expected = "Invoices above 500,000.00 need a Director as the second approver; evan.morris is a Manager."
++
++    with pytest.raises(ApprovalNotAllowed, match=re.escape(expected)):
++        service.approve("INV-2", approver)
++
++    assert repository.update_calls == 0
++    assert repository.get_by_id("INV-2") == original
++
++
++def test_second_approval_refuses_two_different_managers() -> None:
++    invoice = invoice_for("500000.01")
++    invoice.status = InvoiceStatus.AwaitingSecondApproval
++    invoice.approvals = [
++        ApprovalRecord(username="maria.chen", role=Role.MANAGER, approved_at=FIXED_NOW),
++    ]
++    service, repository = make_service(invoice)
++    original = repository.get_by_id("INV-2")
++    approver = Approver("nina.patel", Role.MANAGER)
++    expected = "Invoices above 500,000.00 need a Director as the second approver; nina.patel is a Manager."
++
++    with pytest.raises(ApprovalNotAllowed, match=re.escape(expected)):
++        service.approve("INV-2", approver)
++
++    assert repository.update_calls == 0
++    assert repository.get_by_id("INV-2") == original
++
++
++def test_second_approver_must_be_a_different_director() -> None:
++    invoice = invoice_for("500000.01")
++    invoice.status = InvoiceStatus.AwaitingSecondApproval
++    invoice.approvals = [
++        ApprovalRecord(username="maria.chen", role=Role.MANAGER, approved_at=FIXED_NOW),
++    ]
++    service, repository = make_service(invoice)
++
++    result = service.approve("INV-2", Approver("olivia.riggs", Role.DIRECTOR))
++
++    assert result.status == InvoiceStatus.Approved
++    assert result.decided_by == "olivia.riggs"
++    assert result.decided_at == FIXED_NOW
++    assert len(result.approvals) == 2
++    assert repository.update_calls == 1
++
++
++def test_awaiting_second_approval_can_be_rejected_by_director() -> None:
++    invoice = invoice_for("500000.01")
++    invoice.status = InvoiceStatus.AwaitingSecondApproval
++    invoice.approvals = [
++        ApprovalRecord(username="maria.chen", role=Role.MANAGER, approved_at=FIXED_NOW),
++    ]
++    service, repository = make_service(invoice)
++    reason = "Budget not approved"
++
++    result = service.reject("INV-2", Approver("sophia.ng", Role.DIRECTOR), reason)
++
++    assert result.status == InvoiceStatus.Rejected
++    assert result.decision_note == reason
++    assert result.decided_by == "sophia.ng"
++    assert result.decided_at == FIXED_NOW
++    assert repository.update_calls == 1
+diff --git a/e2e/conftest.py b/e2e/conftest.py
+new file mode 100644
+index 0000000..aa3c116
+--- /dev/null
++++ b/e2e/conftest.py
+@@ -0,0 +1,56 @@
++from __future__ import annotations
++
++from collections.abc import Iterator
++import subprocess
++import sys
++import time
++from pathlib import Path
++from urllib.error import URLError
++from urllib.request import urlopen
++
++import pytest
++
++
++@pytest.fixture(scope="session")
++def base_url() -> str:
++    return "http://127.0.0.1:5000"
++
++
++@pytest.fixture(scope="session", autouse=True)
++def app_server() -> Iterator[None]:
++    backend_dir = Path(__file__).resolve().parent.parent / "backend"
++    process = subprocess.Popen(
++        [
++            sys.executable,
++            "-m",
++            "uvicorn",
++            "invoice_app.api.main:app",
++            "--app-dir",
++            "src",
++            "--port",
++            "5000",
++        ],
++        cwd=backend_dir,
++    )
++
++    try:
++        for _ in range(100):
++            if process.poll() is not None:
++                raise RuntimeError(f"Uvicorn exited during startup with code {process.returncode}.")
++            try:
++                with urlopen("http://127.0.0.1:5000", timeout=0.2):
++                    break
++            except URLError:
++                time.sleep(0.1)
++        else:
++            raise RuntimeError("Uvicorn did not become ready at http://127.0.0.1:5000.")
++
++        yield
++    finally:
++        if process.poll() is None:
++            process.terminate()
++            try:
++                process.wait(timeout=10)
++            except subprocess.TimeoutExpired:
++                process.kill()
++                process.wait()
+diff --git a/e2e/package-lock.json b/e2e/package-lock.json
+deleted file mode 100644
+index 6222391..0000000
+--- a/e2e/package-lock.json
++++ /dev/null
+@@ -1,76 +0,0 @@
+-{
+-  "name": "invoice-app-e2e",
+-  "lockfileVersion": 3,
+-  "requires": true,
+-  "packages": {
+-    "": {
+-      "name": "invoice-app-e2e",
+-      "devDependencies": {
+-        "@playwright/test": "^1.49.0",
+-        "@types/node": "^20.0.0"
+-      }
+-    },
+-    "node_modules/@playwright/test": {
+-      "version": "1.63.0",
+-      "resolved": "https://registry.npmjs.org/@playwright/test/-/test-1.63.0.tgz",
+-      "integrity": "sha512-oxMK4vllB9RK5NQ2l1pq1IfOf2AvnEuj/vYGDj0H2nMtmtZpKtCwt/l00GEO6xjGfpBNAvjovvYdCm50dRQkpQ==",
+-      "dev": true,
+-      "license": "Apache-2.0",
+-      "dependencies": {
+-        "playwright": "1.63.0"
+-      },
+-      "bin": {
+-        "playwright": "cli.js"
+-      },
+-      "engines": {
+-        "node": ">=20"
+-      }
+-    },
+-    "node_modules/@types/node": {
+-      "version": "20.19.43",
+-      "resolved": "https://registry.npmjs.org/@types/node/-/node-20.19.43.tgz",
+-      "integrity": "sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==",
+-      "dev": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "undici-types": "~6.21.0"
+-      }
+-    },
+-    "node_modules/playwright": {
+-      "version": "1.63.0",
+-      "resolved": "https://registry.npmjs.org/playwright/-/playwright-1.63.0.tgz",
+-      "integrity": "sha512-+7ziBLidS4NaNCdt57SUDT+wYmmd5fmiQejUic/kb+YsYSCPyOOE9sebzMjNmQrsnNpDJqd4WHvV/8lfKfUDUg==",
+-      "dev": true,
+-      "license": "Apache-2.0",
+-      "dependencies": {
+-        "playwright-core": "1.63.0"
+-      },
+-      "bin": {
+-        "playwright": "cli.js"
+-      },
+-      "engines": {
+-        "node": ">=20"
+-      }
+-    },
+-    "node_modules/playwright-core": {
+-      "version": "1.63.0",
+-      "resolved": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.63.0.tgz",
+-      "integrity": "sha512-rYCsBF/M5HjUch52bbtVONEFjv6Xu8sm8h72dNlR5bzIE1fvC/bxgspzkjSfU+MweEMmPM8KJebG6nnyxo5mCg==",
+-      "dev": true,
+-      "license": "Apache-2.0",
+-      "bin": {
+-        "playwright-core": "cli.js"
+-      },
+-      "engines": {
+-        "node": ">=20"
+-      }
+-    },
+-    "node_modules/undici-types": {
+-      "version": "6.21.0",
+-      "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz",
+-      "integrity": "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==",
+-      "dev": true,
+-      "license": "MIT"
+-    }
+-  }
+-}
+diff --git a/e2e/package.json b/e2e/package.json
+deleted file mode 100644
+index 30bc5d3..0000000
+--- a/e2e/package.json
++++ /dev/null
+@@ -1,13 +0,0 @@
+-{
+-  "name": "invoice-app-e2e",
+-  "private": true,
+-  "scripts": {
+-    "test": "playwright test",
+-    "test:headed": "playwright test --headed",
+-    "report": "playwright show-report"
+-  },
+-  "devDependencies": {
+-    "@playwright/test": "^1.49.0",
+-    "@types/node": "^20.0.0"
+-  }
+-}
+diff --git a/e2e/pages/.gitkeep b/e2e/pages/.gitkeep
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/e2e/pages/invoice_app_page.py b/e2e/pages/invoice_app_page.py
+new file mode 100644
+index 0000000..42ecb72
+--- /dev/null
++++ b/e2e/pages/invoice_app_page.py
+@@ -0,0 +1,42 @@
++import re
++
++from playwright.sync_api import Locator, Page
++
++
++class InvoiceAppPage:
++    def __init__(self, page: Page) -> None:
++        self.page = page
++
++    def open(self, base_url: str) -> None:
++        self.page.goto(base_url)
++
++    def sign_in(self, username: str, password: str) -> None:
++        self.page.get_by_label("Username").fill(username)
++        self.page.get_by_label("Password").fill(password)
++        self.page.get_by_role("button", name="Sign in").click()
++
++    def create_invoice(self, customer_name: str, amount: str) -> None:
++        self.page.get_by_label("Customer name").fill(customer_name)
++        self.page.get_by_label("Amount").fill(amount)
++        self.page.get_by_role("button", name="Create invoice").click()
++
++    def submit_invoice(self, customer_name: str) -> None:
++        invoice_row = self.page.get_by_role("row").filter(has_text=customer_name)
++        invoice_row.get_by_role("button", name=re.compile(r"Submit invoice .* for approval")).click()
++
++    def open_approvals(self) -> None:
++        self.page.get_by_role("tab", name="Approvals").click()
++
++    def approve_invoice(self, customer_name: str) -> None:
++        invoice_item = self.page.get_by_role("listitem").filter(has_text=customer_name)
++        invoice_item.get_by_role("button", name=re.compile(r"Approve invoice .*")).click()
++
++    def open_invoices(self) -> None:
++        self.page.get_by_role("tab", name="Invoices").click()
++
++    def decision_alert(self) -> Locator:
++        return self.page.get_by_role("tabpanel", name="Approvals").get_by_role("alert")
++
++    def invoice_status(self, customer_name: str) -> Locator:
++        invoice_row = self.page.get_by_role("row").filter(has_text=customer_name)
++        return invoice_row.get_by_role("cell", name="Pending Approval")
+diff --git a/e2e/playwright.config.ts b/e2e/playwright.config.ts
+deleted file mode 100644
+index 074c8c4..0000000
+--- a/e2e/playwright.config.ts
++++ /dev/null
+@@ -1,19 +0,0 @@
+-import { defineConfig, devices } from '@playwright/test';
+-
+-export default defineConfig({
+-  testDir: './tests',
+-  workers: 1,
+-  retries: process.env.CI ? 1 : 0,
+-  reporter: [['list'], ['html', { open: 'never' }]],
+-  use: {
+-    baseURL: 'http://localhost:5000',
+-    trace: 'on-first-retry',
+-  },
+-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+-  webServer: {
+-    command: 'dotnet run --project ../backend/src/InvoiceApp.Api',
+-    url: 'http://localhost:5000',
+-    reuseExistingServer: true,
+-    timeout: 120_000,
+-  },
+-});
+diff --git a/e2e/pytest.ini b/e2e/pytest.ini
+new file mode 100644
+index 0000000..57bb8b3
+--- /dev/null
++++ b/e2e/pytest.ini
+@@ -0,0 +1,4 @@
++[pytest]
++testpaths = tests
++pythonpath = .
++addopts = --browser chromium
+diff --git a/e2e/tests/.gitkeep b/e2e/tests/.gitkeep
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/e2e/tests/test_over_limit_rejection.py b/e2e/tests/test_over_limit_rejection.py
+new file mode 100644
+index 0000000..b299649
+--- /dev/null
++++ b/e2e/tests/test_over_limit_rejection.py
+@@ -0,0 +1,22 @@
++from playwright.sync_api import Page, expect
++
++from pages.invoice_app_page import InvoiceAppPage
++
++
++def test_manager_cannot_approve_invoice_above_limit(page: Page, base_url: str) -> None:
++    customer_name = "Over-limit approval customer"
++    invoice_app = InvoiceAppPage(page)
++
++    invoice_app.open(base_url)
++    invoice_app.sign_in("demo.manager", "ChangeMe123!")
++    invoice_app.create_invoice(customer_name, "75000")
++    invoice_app.submit_invoice(customer_name)
++    invoice_app.open_approvals()
++    invoice_app.approve_invoice(customer_name)
++
++    expect(invoice_app.decision_alert()).to_contain_text(
++        "exceeds the Manager approval limit of 50,000.00"
++    )
++
++    invoice_app.open_invoices()
++    expect(invoice_app.invoice_status(customer_name)).to_be_visible()

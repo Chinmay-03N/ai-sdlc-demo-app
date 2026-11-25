@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-python@v5
         with:
-          dotnet-version: '8.0.x'
-      - run: dotnet build backend/InvoiceApp.sln --configuration Release
-      - run: dotnet test backend/InvoiceApp.sln --configuration Release --no-build
+          python-version: '3.11'
+      - run: cd backend && pip install -e ".[dev]" && pytest
